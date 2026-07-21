@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Testsheet - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px); /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px; /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left panel: Controls */
+    .controls-panel {
+      width: 340px;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    /* Right panel: Specimen page */
+    .specimen-panel {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* White page sheet styling */
+    .page-sheet {
+      width: 100%;
+      max-width: 800px;
+      background-color: #ffffff;
+      border: 1px solid #d2d2d2;
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      padding: 50px;
+      box-sizing: border-box;
+      color: #000000;
+      text-align: left;
+    }
+
+    /* Custom input styling consistent with other tools */
+    .input-field {
+      width: 100%;
+      border: none;
+      border-bottom: 2px dashed #0052CC;
+      background: transparent;
+      padding: 8px 0;
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 15px;
+      color: #000000;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-bottom-style: solid;
+    }
+
+    /* Drag and drop upload zone */
+    .upload-zone {
+      border: 2px dashed #0052CC;
+      border-radius: 4px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(0, 82, 204, 0.02);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      background-color: rgba(0, 82, 204, 0.08);
+      border-color: #ff0059;
+    }
+
+    .upload-zone p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #555;
+    }
+
+    /* Custom scrollbars */
+    .specimen-panel::-webkit-scrollbar,
+    .controls-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .specimen-panel::-webkit-scrollbar-track,
+    .controls-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+    .specimen-panel::-webkit-scrollbar-thumb,
+    .controls-panel::-webkit-scrollbar-thumb {
+      background: #0052CC;
+      border-radius: 10px;
+    }
+
+    /* Typography specimen styles inside the page sheet */
+    .specimen-section {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 30px;
+    }
+
+    .specimen-section:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .specimen-section-title {
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #999;
+      margin-bottom: 20px;
+    }
+
+    .specimen-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #000;
+      padding-bottom: 15px;
+      margin-bottom: 35px;
+    }
+
+    .specimen-meta h2 {
+      margin: 0;
+      font-size: clamp(24px, 2.5vw, 36px);
+      font-weight: bold;
+      line-height: 1.1;
+    }
+
+    .specimen-meta span {
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .character-row {
+      font-size: 16px;
+      line-height: 1.8;
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    .size-sample {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .size-sample:last-child {
+      margin-bottom: 0;
+    }
+
+    .size-label {
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 10px;
+      color: #888;
+    }
+
+    .size-text {
+      line-height: 1.2;
+    }
+
+    /* Print styling to generate perfect clean PDF specimen sheets */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      .header, .key-hints, .controls-panel {
+        display: none !important;
+      }
+      .main-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .specimen-panel {
+        overflow: visible !important;
+        height: auto !important;
+        padding: 0 !important;
+      }
+      .page-sheet {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Font Testsheet</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="controls-panel">
+      <!-- Upload File -->
+      <div>
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; opacity: 0.75; font-weight: bold;">Schriftdatei laden</div>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="font-file-input" accept=".otf,.ttf,.woff,.woff2" style="display: none;" />
+          <p id="upload-status">Klicke hier oder ziehe eine Schriftdatei hinein<br><span style="font-size: 10px; opacity: 0.7;">(.otf, .ttf, .woff, .woff2)</span></p>
+        </div>
+      </div>
+
+      <!-- Test Sentence -->
+      <div>
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; opacity: 0.75; font-weight: bold;">Eigener Testtext</div>
+        <input type="text" id="test-text-input" class="input-field" value="Franz jagt im komplett verwahrlosten Taxi quer durch Bayern" placeholder="Gib hier einen eigenen Testtext ein..." />
+      </div>
+
+      <!-- Print Button -->
+      <div style="margin-top: 10px;">
+        <button type="button" class="info-btn" id="btn-print" style="width: 100%; text-transform: uppercase;">PDF herunterladen / Drucken ↗</button>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: SPECIMEN SHEET -->
+    <div class="specimen-panel">
+      <div class="page-sheet" id="specimen-page">
+        <!-- SPECIMEN HEADER -->
+        <div class="specimen-meta">
+          <div>
+            <h2 id="font-title">GT America Mono</h2>
+            <span id="font-filename">System Standard</span>
+          </div>
+          <span id="current-date">08. Juli 2026</span>
+        </div>
+
+        <!-- SECTION 1: ZEICHENSATZ -->
+        <div class="specimen-section">
+          <div class="specimen-section-title">Zeichensatz</div>
+          <div class="character-row" style="font-weight: bold;">A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Ä Ö Ü</div>
+          <div class="character-row">a b c d e f g h i j k l m n o p q r s t u v w x y z ä ö ü ß</div>
+          <div class="character-row">0 1 2 3 4 5 6 7 8 9 . , ; : ! ? * + - = ( ) [ ] { } &amp; € $ @</div>
+        </div>
+
+        <!-- SECTION 2: SCHRIFTGRÖSSEN -->
+        <div class="specimen-section">
+          <div class="specimen-section-title">Schriftgrößen (Sizing)</div>
+          <div class="size-sample">
+            <span class="size-label">64 pt</span>
+            <span class="size-text" style="font-size: 64px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">36 pt</span>
+            <span class="size-text" style="font-size: 36px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">24 pt</span>
+            <span class="size-text" style="font-size: 24px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">16 pt</span>
+            <span class="size-text" style="font-size: 16px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">12 pt</span>
+            <span class="size-text" style="font-size: 12px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">8 pt</span>
+            <span class="size-text" style="font-size: 8px;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+        </div>
+
+        <!-- SECTION 3: LAUFWEITEN -->
+        <div class="specimen-section">
+          <div class="specimen-section-title">Laufweiten (Tracking)</div>
+          <div class="size-sample">
+            <span class="size-label">16 pt | Laufweite -0.05em</span>
+            <span class="size-text" style="font-size: 16px; letter-spacing: -0.05em;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">16 pt | Laufweite Normal</span>
+            <span class="size-text" style="font-size: 16px; letter-spacing: 0;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">16 pt | Laufweite 0.1em</span>
+            <span class="size-text" style="font-size: 16px; letter-spacing: 0.1em;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+          <div class="size-sample">
+            <span class="size-label">16 pt | Laufweite 0.25em</span>
+            <span class="size-text" style="font-size: 16px; letter-spacing: 0.25em;" data-preview-text>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern</span>
+          </div>
+        </div>
+
+        <!-- SECTION 4: ZEILENABSTÄNDE -->
+        <div class="specimen-section">
+          <div class="specimen-section-title">Zeilenabstände (Leading)</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+              <span class="size-label">10 pt | Zeilenabstand 1.0</span>
+              <p style="font-size: 10px; line-height: 1.0; margin: 6px 0 0 0;" data-leading-text>
+                Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. Die schnelle braune Hündin springt über den faulen Hund. Morgen schon werden wir das Ergebnis sehen. Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.
+              </p>
+            </div>
+            <div>
+              <span class="size-label">10 pt | Zeilenabstand 1.5</span>
+              <p style="font-size: 10px; line-height: 1.5; margin: 6px 0 0 0;" data-leading-text>
+                Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. Die schnelle braune Hündin springt über den faulen Hund. Morgen schon werden wir das Ergebnis sehen. Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+  </div>
+
+  <script>
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('font-file-input');
+    const uploadStatus = document.getElementById('upload-status');
+    const testTextInput = document.getElementById('test-text-input');
+    const specimenPage = document.getElementById('specimen-page');
+    const fontTitle = document.getElementById('font-title');
+    const fontFilename = document.getElementById('font-filename');
+    const currentDate = document.getElementById('current-date');
+    const btnPrint = document.getElementById('btn-print');
+
+    // Display current date on load
+    const dateOpts = { day: '2-digit', month: 'long', year: 'numeric' };
+    currentDate.textContent = new Date().toLocaleDateString('de-DE', dateOpts);
+
+    // Live update test sentences
+    testTextInput.addEventListener('input', () => {
+      const txt = testTextInput.value || "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern";
+      document.querySelectorAll('[data-preview-text]').forEach(el => {
+        el.textContent = txt;
+      });
+      document.querySelectorAll('[data-leading-text]').forEach(el => {
+        el.textContent = `${txt}. Die schnelle braune Hündin springt über den faulen Hund. Morgen schon werden wir das Ergebnis sehen. ${txt}.`;
+      });
+    });
+
+    // File selection trigger
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    // Drag over styling
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFontFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFontFile(e.target.files[0]);
+      }
+    });
+
+    // Font file parser and dynamic loading
+    function handleFontFile(file) {
+      const validExtensions = ['otf', 'ttf', 'woff', 'woff2'];
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      
+      if (!validExtensions.includes(fileExt)) {
+        alert('Ungültiges Dateiformat. Bitte lade eine .otf, .ttf oder .woff/.woff2 Datei hoch.');
+        return;
+      }
+
+      uploadStatus.innerHTML = `Lade Schriftart...<br><span style="font-size: 11px;">${file.name}</span>`;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        const tempFontFamilyName = 'CustomUploadedFont_' + Date.now();
+        
+        const fontFace = new FontFace(tempFontFamilyName, arrayBuffer);
+        fontFace.load().then(loadedFace => {
+          document.fonts.add(loadedFace);
+          
+          // Apply new font to the printed page container
+          specimenPage.style.fontFamily = `"${tempFontFamilyName}", sans-serif`;
+          
+          // Clean file name for title
+          const cleanName = file.name.replace(/\.[^/.]+$/, "");
+          fontTitle.textContent = cleanName;
+          fontFilename.textContent = file.name;
+          
+          uploadStatus.innerHTML = `Erfolgreich geladen!<br><span style="font-size: 11px; color: #34C759; font-weight: bold;">${file.name}</span>`;
+        }).catch(err => {
+          console.error(err);
+          uploadStatus.innerHTML = `Fehler beim Laden.<br><span style="font-size: 10px; color: #FF3B30;">Treiber defekt?</span>`;
+          alert('Die Schriftdatei konnte vom Browser nicht verarbeitet werden.');
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Print specimen page (triggers browser print / save-to-pdf dialog)
+    btnPrint.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Escape redirects to landing page
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

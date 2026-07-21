@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Präsi Timer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Custom styles for Präsi Timer */
+    .center-form-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: none;
+      border: none;
+      padding: 0;
+      z-index: 100;
+      width: 380px;
+      box-shadow: none;
+      font-family: 'GT-America-Mono', monospace;
+      text-align: center;
+    }
+
+    #timer-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .minimalist-input {
+      background: none;
+      border: none;
+      border-bottom: 2px dashed #0052CC;
+      color: #0052CC;
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 28px;
+      font-weight: 500;
+      text-align: center;
+      padding: 4px;
+      width: 75px;
+      outline: none;
+      transition: color 0.2s, border-bottom-color 0.2s;
+      -moz-appearance: textfield;
+    }
+
+    .minimalist-input::-webkit-outer-spin-button,
+    .minimalist-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .minimalist-input:focus {
+      color: #ff0059;
+      border-bottom-color: #ff0059;
+    }
+
+    /* Fullscreen Mode for Active Timer */
+    .fullscreen-timer-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+    }
+
+    .timer-display-large {
+      font-size: clamp(80px, 18vw, 360px);
+      font-weight: 500;
+      color: #0052CC;
+      text-align: center;
+      font-family: 'GT-America-Mono', monospace;
+      margin: 10px 0;
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+    }
+
+    .timer-person-title-large {
+      font-size: clamp(14px, 1.5vw, 24px);
+      color: #777;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .timer-controls-large {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link">
+        <h1>← tools für gestalter:innen</h1>
+      </a>
+      <h1 style="color: #000000; margin-top: 4px;">Präsi-Timer</h1>
+    </div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="center-form-container" id="setup-screen">
+    <form id="timer-form">
+      <div style="font-size: 13px; color: #777; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px;">Vortrag konfigurieren</div>
+      
+      <!-- Modus-Umschalter -->
+      <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 24px;">
+        <button type="button" class="info-btn active" id="btn-mode-individual" style="font-size: 10px; padding: 4px 12px; min-height: 26px; border-radius: 4px; text-transform: uppercase;">Zeit pro Person</button>
+        <button type="button" class="info-btn" id="btn-mode-total" style="font-size: 10px; padding: 4px 12px; min-height: 26px; border-radius: 4px; text-transform: uppercase;">Gesamtzeit aufteilen</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+        <!-- Modus 1: Einzelzeit -->
+        <div id="container-individual">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; margin-bottom: 8px;">Zeit pro Person</div>
+          <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+            <input type="number" id="input-minutes" min="0" max="99" value="5" class="minimalist-input" required />
+            <span style="font-size: 28px; font-weight: 500; color: #0052CC; position: relative; top: -4px;">:</span>
+            <input type="number" id="input-seconds" min="0" max="59" value="0" class="minimalist-input" required />
+          </div>
+        </div>
+
+        <!-- Modus 2: Gesamtzeit -->
+        <div id="container-total" style="display: none;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; margin-bottom: 8px;">Gesamtzeit</div>
+          <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+            <input type="number" id="input-total-minutes" min="0" max="999" value="15" class="minimalist-input" style="width: 90px;" />
+            <span style="font-size: 28px; font-weight: 500; color: #0052CC; position: relative; top: -4px;">:</span>
+            <input type="number" id="input-total-seconds" min="0" max="59" value="0" class="minimalist-input" />
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; margin-bottom: 8px;">Anzahl Personen</div>
+          <input type="number" id="input-people" min="1" max="100" required value="3" class="minimalist-input" style="width: 100px;" />
+        </div>
+      </div>
+
+      <button type="submit" id="submit-btn" class="info-btn" style="min-width: 120px; min-height: 36px; margin: 24px auto 0 auto; display: inline-flex; text-transform: uppercase;">LOS</button>
+    </form>
+  </div>
+
+  <!-- ACTIVE TIMER SCREEN -->
+  <div class="fullscreen-timer-container" id="timer-screen" style="display: none;">
+    <div id="timer-person-title" class="timer-person-title-large">Person 1 von 3</div>
+    <div class="timer-display-large" id="timer-display-time">05:00</div>
+    <div class="timer-controls-large">
+      <button type="button" id="pause-btn" class="info-btn" style="min-width: 140px; min-height: 38px;">Pause</button>
+      <button type="button" id="cancel-btn" class="info-btn btn-red" style="min-width: 140px; min-height: 38px;">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- TIMES UP SCREEN -->
+  <div class="center-form-container" id="timesup-screen" style="display: none;">
+    <div id="timesup-person-title" style="font-size: 13px; color: #777; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;">Person 1 von 3</div>
+    <div style="font-size: clamp(28px, 3.2vw, 48px); font-weight: bold; color: #FF3B30; text-transform: uppercase; margin-bottom: 32px; letter-spacing: 0.02em; line-height: 1.2;">ZEIT IST RUM!</div>
+    <button type="button" id="next-btn" class="info-btn" style="min-width: 180px; min-height: 38px;">NÄCHSTER</button>
+  </div>
+
+  <!-- FINISH SCREEN -->
+  <div class="center-form-container" id="finish-screen" style="display: none;">
+    <div style="font-size: clamp(22px, 2.5vw, 40px); font-weight: bold; color: #34C759; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.02em; line-height: 1.3;">ALLE PRÄSENTATIONEN BEENDET!</div>
+    <div style="font-size: 13px; color: #555; text-transform: uppercase; margin-bottom: 32px; line-height: 1.5; letter-spacing: 0.03em;">Vorträge erfolgreich abgeschlossen.</div>
+    <button type="button" id="restart-btn" class="info-btn" style="min-width: 180px; min-height: 38px;">NEU STARTEN</button>
+  </div>
+
+  <!-- Tastatur-Hinweis (Escape zum Zurückkehren) -->
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+  </div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(245, 245, 245, 0.8); z-index: 10000; justify-content: center; align-items: center; text-transform: lowercase;">
+    <div style="background: white; padding: 40px; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); font-family: 'GT-America-Mono', monospace; text-align: center; border: 1px solid #0052CC;">
+      <p style="margin-top: 0; margin-bottom: 30px; font-size: 16px; color: #0052CC;">möchtest du den timer abbrechen?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="confirm-yes" class="info-btn btn-red" style="padding: 10px 20px; font-size: 14px;">ja, abbrechen</button>
+        <button id="confirm-no" class="info-btn" style="padding: 10px 20px; font-size: 14px;">zurück</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const setupScreen = document.getElementById('setup-screen');
+    const timerScreen = document.getElementById('timer-screen');
+    const timesupScreen = document.getElementById('timesup-screen');
+    const finishScreen = document.getElementById('finish-screen');
+
+    const form = document.getElementById('timer-form');
+    const inputMinutes = document.getElementById('input-minutes');
+    const inputSeconds = document.getElementById('input-seconds');
+    const inputPeople = document.getElementById('input-people');
+    
+    // Modus-Steuerung
+    let currentMode = 'individual';
+    const btnModeIndividual = document.getElementById('btn-mode-individual');
+    const btnModeTotal = document.getElementById('btn-mode-total');
+    const containerIndividual = document.getElementById('container-individual');
+    const containerTotal = document.getElementById('container-total');
+    const inputTotalMinutes = document.getElementById('input-total-minutes');
+    const inputTotalSeconds = document.getElementById('input-total-seconds');
+
+    btnModeIndividual.addEventListener('click', () => {
+      currentMode = 'individual';
+      btnModeIndividual.classList.add('active');
+      btnModeTotal.classList.remove('active');
+      containerIndividual.style.display = 'block';
+      containerTotal.style.display = 'none';
+      inputMinutes.required = true;
+      inputSeconds.required = true;
+      inputTotalMinutes.required = false;
+      inputTotalSeconds.required = false;
+    });
+
+    btnModeTotal.addEventListener('click', () => {
+      currentMode = 'total';
+      btnModeTotal.classList.add('active');
+      btnModeIndividual.classList.remove('active');
+      containerIndividual.style.display = 'none';
+      containerTotal.style.display = 'block';
+      inputMinutes.required = false;
+      inputSeconds.required = false;
+      inputTotalMinutes.required = true;
+      inputTotalSeconds.required = true;
+    });
+
+    const timerPersonTitle = document.getElementById('timer-person-title');
+    const timerDisplayTime = document.getElementById('timer-display-time');
+    const pauseBtn = document.getElementById('pause-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    const timesupPersonTitle = document.getElementById('timesup-person-title');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let totalPeople = 0;
+    let currentPerson = 1;
+    let initialTimeSeconds = 0;
+    let timeLeftSeconds = 0;
+    let timerInterval = null;
+    let isPaused = false;
+
+    // Helper to format MM:SS
+    function formatTime(totalSecs) {
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Web Audio synthesizer beep
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime); // 880Hz tone (A5)
+
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4); // fade out over 0.4s
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+      } catch (e) {
+        console.warn("AudioContext failed to start", e);
+      }
+    }
+
+    // Show setup screen
+    function resetToSetup() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      isPaused = false;
+      pauseBtn.textContent = 'Pause';
+
+      setupScreen.style.display = 'block';
+      timerScreen.style.display = 'none';
+      timesupScreen.style.display = 'none';
+      finishScreen.style.display = 'none';
+    }
+
+    // Start timer sequence for current person
+    function startTimerForPerson() {
+      clearInterval(timerInterval);
+      isPaused = false;
+      pauseBtn.textContent = 'Pause';
+
+      timerPersonTitle.textContent = `Person ${currentPerson} von ${totalPeople}`;
+      timerDisplayTime.textContent = formatTime(timeLeftSeconds);
+      timerDisplayTime.style.color = '#0052CC';
+
+      setupScreen.style.display = 'none';
+      timerScreen.style.display = 'flex';
+      timesupScreen.style.display = 'none';
+      finishScreen.style.display = 'none';
+
+      timerInterval = setInterval(() => {
+        if (!isPaused) {
+          timeLeftSeconds--;
+          timerDisplayTime.textContent = formatTime(timeLeftSeconds);
+
+          // Visual warning during last 10 seconds
+          if (timeLeftSeconds <= 10) {
+            timerDisplayTime.style.color = '#FF3B30';
+          }
+
+          if (timeLeftSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            playBeep();
+
+            // Show times up screen
+            timesupPersonTitle.textContent = `Person ${currentPerson} von ${totalPeople}`;
+            if (currentPerson === totalPeople) {
+              nextBtn.textContent = 'FERTIG';
+            } else {
+              nextBtn.textContent = 'NÄCHSTER';
+            }
+
+            timerScreen.style.display = 'none';
+            timesupScreen.style.display = 'block';
+          }
+        }
+      }, 1000);
+    }
+
+    // Form Submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      totalPeople = parseInt(inputPeople.value) || 1;
+
+      if (currentMode === 'individual') {
+        const mins = parseInt(inputMinutes.value) || 0;
+        const secs = parseInt(inputSeconds.value) || 0;
+        initialTimeSeconds = (mins * 60) + secs;
+      } else {
+        const totalMins = parseInt(inputTotalMinutes.value) || 0;
+        const totalSecs = parseInt(inputTotalSeconds.value) || 0;
+        const totalTimeSeconds = (totalMins * 60) + totalSecs;
+        initialTimeSeconds = Math.floor(totalTimeSeconds / totalPeople);
+      }
+
+      if (initialTimeSeconds <= 0) {
+        alert('Bitte gib eine gültige Zeit an, die aufgeteilt werden kann.');
+        return;
+      }
+
+      currentPerson = 1;
+      timeLeftSeconds = initialTimeSeconds;
+
+      startTimerForPerson();
+    });
+
+    // Pause/Resume button
+    pauseBtn.addEventListener('click', () => {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? 'Weiter' : 'Pause';
+    });
+
+    // Cancel button
+    cancelBtn.addEventListener('click', () => {
+      document.getElementById('custom-confirm').style.display = 'flex';
+    });
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+      resetToSetup();
+      document.getElementById('custom-confirm').style.display = 'none';
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+      document.getElementById('custom-confirm').style.display = 'none';
+    });
+
+    // Next person button
+    nextBtn.addEventListener('click', () => {
+      if (currentPerson < totalPeople) {
+        currentPerson++;
+        timeLeftSeconds = initialTimeSeconds;
+        startTimerForPerson();
+      } else {
+        // All people finished
+        timesupScreen.style.display = 'none';
+        finishScreen.style.display = 'block';
+      }
+    });
+
+    // Restart button
+    restartBtn.addEventListener('click', () => {
+      resetToSetup();
+    });
+
+    // Keyboard support: Escape returns to main page
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+
+</html>

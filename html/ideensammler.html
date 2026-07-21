@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideensammler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Custom styles for Ideensammler page */
+    .center-form-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(245, 245, 245, 0.95);
+      border: 1px solid #0052CC;
+      padding: 24px;
+      z-index: 100;
+      width: 320px;
+      border-radius: 4px;
+      box-shadow: 0 4px 24px rgba(0, 82, 204, 0.08);
+      font-family: 'GT-America-Mono', monospace;
+    }
+
+    #idea-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #idea-form label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #555;
+    }
+
+    #idea-form input[type="text"] {
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 4px;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #idea-form input[type="text"]:focus {
+      border-color: #0052CC;
+    }
+
+    .color-picker-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .color-options {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .color-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .color-circle:hover {
+      transform: scale(1.15);
+    }
+
+    .color-circle.active {
+      border-color: #000;
+      transform: scale(1.1);
+    }
+
+    #submit-btn {
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      background-color: #0052CC;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: background-color 0.2s;
+    }
+
+    #submit-btn:hover {
+      background-color: #003d99;
+    }
+
+    /* Mindmap nodes style */
+    .idea-node {
+      position: absolute;
+      padding: 10px 24px;
+      background-color: var(--node-color, #0052CC);
+      color: var(--text-color, #ffffff);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      cursor: grab;
+      user-select: none;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border-radius: 100px; /* Abgerundeter Button */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.1s ease;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .idea-node:active {
+      cursor: grabbing;
+      transform: scale(1.03);
+      z-index: 1000;
+    }
+
+    .idea-text {
+      letter-spacing: 0.03em;
+    }
+
+    .idea-tag-label {
+      font-size: 9px;
+      color: inherit;
+      opacity: 0.75;
+      letter-spacing: 0.05em;
+    }
+
+    .idea-delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: inherit;
+      opacity: 0.6;
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      display: none;
+    }
+
+    .idea-node:hover .idea-delete-btn {
+      display: block;
+    }
+
+    .idea-delete-btn:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link">
+        <h1>← tools für gestalter:innen</h1>
+      </a>
+      <h1 style="color: #000000; margin-top: 4px;">Ideensammler</h1>
+    </div>
+  </div>
+
+  <!-- SVG for connection lines -->
+  <svg id="connections" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1;"></svg>
+
+  <div class="center-form-container" id="idea-form-container">
+    <form id="idea-form">
+      <label for="idea-word">Idee / Wort</label>
+      <input type="text" id="idea-word" placeholder="WORT EINGEBEN..." required autocomplete="off" />
+
+      <label for="idea-tag">Tag (optional)</label>
+      <input type="text" id="idea-tag" placeholder="#THEMA..." autocomplete="off" />
+
+      <div class="color-picker-container">
+        <label>Farbe</label>
+        <div class="color-options">
+          <button type="button" class="color-circle active" data-color="#0052CC" style="background-color: #0052CC;"></button>
+          <button type="button" class="color-circle" data-color="#FF3B30" style="background-color: #FF3B30;"></button>
+          <button type="button" class="color-circle" data-color="#F2FF00" style="background-color: #F2FF00;"></button>
+          <button type="button" class="color-circle" data-color="#00FFCC" style="background-color: #00FFCC;"></button>
+        </div>
+      </div>
+
+      <button type="submit" id="submit-btn">HINZUFÜGEN</button>
+    </form>
+  </div>
+
+  <button id="clear-board-btn" class="info-btn btn-red" style="position: fixed; bottom: 24px; right: 24px; z-index: 1000; pointer-events: auto;">Board leeren</button>
+
+  <!-- Custom Confirm Modal -->
+  <div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(245, 245, 245, 0.8); z-index: 10000; justify-content: center; align-items: center; text-transform: lowercase;">
+    <div style="background: white; padding: 40px; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); font-family: 'GT-America-Mono', monospace; text-align: center; border: 1px solid #0052CC;">
+      <p style="margin-top: 0; margin-bottom: 30px; font-size: 16px; color: #0052CC;">möchtest du alle ideen löschen?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="confirm-yes" class="info-btn btn-red" style="padding: 10px 20px; font-size: 14px;">ja, löschen</button>
+        <button id="confirm-no" class="info-btn" style="padding: 10px 20px; font-size: 14px;">abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('idea-form');
+    const wordInput = document.getElementById('idea-word');
+    const tagInput = document.getElementById('idea-tag');
+    const circles = document.querySelectorAll('.color-circle');
+    const clearBtn = document.getElementById('clear-board-btn');
+    const svg = document.getElementById('connections');
+
+    let selectedColor = '#0052CC';
+
+    // Grid sizes (width of slot ~ 160px, height ~ 60px)
+    const gridSizeX = 160;
+    const gridSizeY = 60;
+
+    // Sectors for each color center coordinates if none exist
+    const colorAngles = {
+      '#0052CC': 0,                  // Blue: East
+      '#FF3B30': Math.PI / 2,        // Red: South
+      '#F2FF00': Math.PI,            // Yellow: West
+      '#00FFCC': 3 * Math.PI / 2     // Turquoise: North
+    };
+
+    // Contrast text colors
+    function getContrastColor(hex) {
+      if (hex === '#F2FF00' || hex === '#00FFCC') {
+        return '#000000';
+      }
+      return '#ffffff';
+    }
+
+    // Set active color circle click handler
+    circles.forEach(circle => {
+      circle.addEventListener('click', () => {
+        circles.forEach(c => c.classList.remove('active'));
+        circle.classList.add('active');
+        selectedColor = circle.dataset.color;
+      });
+    });
+
+    // Check if slot is occupied (with tiny tolerance)
+    function isSlotOccupied(x, y, excludeNode = null) {
+      const nodes = document.querySelectorAll('.idea-node');
+      for (const node of nodes) {
+        if (node === excludeNode) continue;
+        const nx = parseFloat(node.style.left) || 0;
+        const ny = parseFloat(node.style.top) || 0;
+        if (Math.abs(nx - x) < 10 && Math.abs(ny - y) < 10) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Grid snaps the coordinates and finds closest unoccupied slot
+    function getNextFreeGridSlot(startX, startY, excludeNode = null) {
+      let x = Math.round(startX / gridSizeX) * gridSizeX;
+      let y = Math.round(startY / gridSizeY) * gridSizeY;
+
+      let attempts = 0;
+      const maxAttempts = 120;
+
+      while (isSlotOccupied(x, y, excludeNode) && attempts < maxAttempts) {
+        attempts++;
+        const angle = attempts * 0.5; // spiral offset
+        const radius = Math.ceil(attempts / 4) * Math.max(gridSizeX, gridSizeY);
+        x = Math.round((startX + Math.cos(angle) * radius) / gridSizeX) * gridSizeX;
+        y = Math.round((startY + Math.sin(angle) * radius) / gridSizeY) * gridSizeY;
+      }
+
+      // Keep inside screen boundaries
+      x = Math.max(40, Math.min(window.innerWidth - 180, x));
+      y = Math.max(100, Math.min(window.innerHeight - 80, y));
+
+      // Snap again after boundaries constraint
+      x = Math.round(x / gridSizeX) * gridSizeX;
+      y = Math.round(y / gridSizeY) * gridSizeY;
+
+      return { x, y };
+    }
+
+    // Node Drag and Drop variables
+    let activeDragNode = null;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let nodeStartX = 0;
+    let nodeStartY = 0;
+
+    // Helper to setup dragging on a node
+    function makeDraggable(node) {
+      node.addEventListener('mousedown', dragStart);
+      node.addEventListener('touchstart', dragStart, { passive: false });
+
+      function dragStart(e) {
+        if (e.target.closest('.idea-delete-btn')) return;
+        
+        e.preventDefault();
+        activeDragNode = node;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        dragStartX = clientX;
+        dragStartY = clientY;
+
+        nodeStartX = parseFloat(node.style.left) || 0;
+        nodeStartY = parseFloat(node.style.top) || 0;
+
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+      }
+
+      function dragMove(e) {
+        if (!activeDragNode) return;
+
+        e.preventDefault();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        const dx = clientX - dragStartX;
+        const dy = clientY - dragStartY;
+
+        let newX = nodeStartX + dx;
+        let newY = nodeStartY + dy;
+
+        // Keep bounds while dragging smoothly
+        newX = Math.max(20, Math.min(window.innerWidth - activeDragNode.offsetWidth - 20, newX));
+        newY = Math.max(80, Math.min(window.innerHeight - activeDragNode.offsetHeight - 20, newY));
+
+        activeDragNode.style.left = `${newX}px`;
+        activeDragNode.style.top = `${newY}px`;
+
+        drawConnections();
+      }
+
+      function dragEnd() {
+        if (activeDragNode) {
+          const curX = parseFloat(activeDragNode.style.left) || 0;
+          const curY = parseFloat(activeDragNode.style.top) || 0;
+          
+          // Snap release node to nearest free grid slot
+          const snapped = getNextFreeGridSlot(curX, curY, activeDragNode);
+          activeDragNode.style.left = `${snapped.x}px`;
+          activeDragNode.style.top = `${snapped.y}px`;
+          
+          saveNodesToLocalStorage();
+          drawConnections();
+        }
+        activeDragNode = null;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchmove', dragMove);
+        document.removeEventListener('touchend', dragEnd);
+      }
+    }
+
+    // Function to calculate positioning
+    function calculateNewPosition(color) {
+      const existingOfColor = Array.from(document.querySelectorAll('.idea-node')).filter(node => node.dataset.color === color);
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+
+      let x, y;
+
+      if (existingOfColor.length > 0) {
+        let sumX = 0;
+        let sumY = 0;
+        existingOfColor.forEach(node => {
+          sumX += parseFloat(node.style.left) || 0;
+          sumY += parseFloat(node.style.top) || 0;
+        });
+        const avgX = sumX / existingOfColor.length;
+        const avgY = sumY / existingOfColor.length;
+
+        // Scatter around existing color group
+        const scatterAngle = Math.random() * Math.PI * 2;
+        const scatterDist = 120 + Math.random() * 80;
+        x = avgX + Math.cos(scatterAngle) * scatterDist;
+        y = avgY + Math.sin(scatterAngle) * scatterDist;
+      } else {
+        // Position in sector
+        const angle = colorAngles[color] || 0;
+        const dist = 260 + Math.random() * 60;
+        x = centerX + Math.cos(angle) * dist - 80;
+        y = centerY + Math.sin(angle) * dist - 20;
+      }
+
+      // Snap to free grid slot
+      return getNextFreeGridSlot(x, y);
+    }
+
+    // DOM Node Creation Helper
+    function createNodeDOM(text, tag, color, left, top) {
+      const node = document.createElement('div');
+      node.className = 'idea-node';
+      node.style.setProperty('--node-color', color);
+      node.style.setProperty('--text-color', getContrastColor(color));
+      node.style.left = left;
+      node.style.top = top;
+      node.dataset.color = color;
+      node.dataset.tag = tag;
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'idea-text';
+      textSpan.textContent = text;
+      node.appendChild(textSpan);
+
+      if (tag && tag.trim() !== '') {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'idea-tag-label';
+        tagSpan.textContent = `#${tag.trim().toLowerCase()}`;
+        node.appendChild(tagSpan);
+      }
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'idea-delete-btn';
+      deleteBtn.innerHTML = '&times;';
+      deleteBtn.title = 'Idee löschen';
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        node.remove();
+        saveNodesToLocalStorage();
+        drawConnections();
+      });
+      node.appendChild(deleteBtn);
+
+      document.body.appendChild(node);
+      makeDraggable(node);
+    }
+
+    // Connection lines renderer
+    function drawConnections() {
+      svg.innerHTML = '';
+      const nodes = Array.from(document.querySelectorAll('.idea-node'));
+      const tagGroups = {};
+
+      nodes.forEach(node => {
+        const tag = node.dataset.tag;
+        if (tag && tag.trim() !== '') {
+          const normTag = tag.trim().toLowerCase();
+          if (!tagGroups[normTag]) {
+            tagGroups[normTag] = [];
+          }
+          tagGroups[normTag].push(node);
+        }
+      });
+
+      Object.keys(tagGroups).forEach(tag => {
+        const group = tagGroups[tag];
+        if (group.length > 1) {
+          // Connect in sequence
+          for (let i = 0; i < group.length - 1; i++) {
+            const rectA = group[i].getBoundingClientRect();
+            const rectB = group[i + 1].getBoundingClientRect();
+
+            const x1 = rectA.left + rectA.width / 2;
+            const y1 = rectA.top + rectA.height / 2;
+            const x2 = rectB.left + rectB.width / 2;
+            const y2 = rectB.top + rectB.height / 2;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#888888');
+            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-dasharray', '4,4');
+            line.setAttribute('opacity', '0.5');
+            svg.appendChild(line);
+          }
+        }
+      });
+    }
+
+    // Persistence functions
+    function saveNodesToLocalStorage() {
+      const nodes = Array.from(document.querySelectorAll('.idea-node'));
+      const ideas = nodes.map(node => ({
+        text: node.querySelector('.idea-text').textContent,
+        tag: node.dataset.tag,
+        color: node.dataset.color,
+        left: node.style.left,
+        top: node.style.top
+      }));
+      localStorage.setItem('ideensammler_nodes', JSON.stringify(ideas));
+    }
+
+    function loadNodesFromLocalStorage() {
+      const saved = localStorage.getItem('ideensammler_nodes');
+      if (saved) {
+        try {
+          const ideas = JSON.parse(saved);
+          ideas.forEach(idea => {
+            createNodeDOM(idea.text, idea.tag, idea.color, idea.left, idea.top);
+          });
+          drawConnections();
+        } catch (e) {
+          console.error("Error loading nodes from storage", e);
+        }
+      }
+    }
+
+    // Form submit listener
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = wordInput.value.trim();
+      let tag = tagInput.value.trim();
+
+      if (tag.startsWith('#')) {
+        tag = tag.substring(1);
+      }
+
+      if (text) {
+        const pos = calculateNewPosition(selectedColor);
+        createNodeDOM(text, tag, selectedColor, `${pos.x}px`, `${pos.y}px`);
+        saveNodesToLocalStorage();
+        drawConnections();
+
+        wordInput.value = '';
+        tagInput.value = '';
+        wordInput.focus();
+      }
+    });
+
+    // Clear board click listener
+    clearBtn.addEventListener('click', () => {
+      document.getElementById('custom-confirm').style.display = 'flex';
+    });
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+      document.querySelectorAll('.idea-node').forEach(node => node.remove());
+      saveNodesToLocalStorage();
+      drawConnections();
+      document.getElementById('custom-confirm').style.display = 'none';
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+      document.getElementById('custom-confirm').style.display = 'none';
+    });
+
+    // Redraw connections on window resize
+    window.addEventListener('resize', () => {
+      drawConnections();
+    });
+
+    // Initial load
+    loadNodesFromLocalStorage();
+  </script>
+</body>
+</html>

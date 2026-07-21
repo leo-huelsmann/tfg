@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback-Tool: Flaschendrehen</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        .card {
+            color: #333;
+            padding: 40px;
+            width: 800px;
+            max-width: 95vw;
+            text-align: center;
+        }
+        .hidden { display: none; }
+        textarea { 
+            width: 80%; 
+            height: 120px; 
+            margin: 15px 0; 
+            font-size: 20px; 
+            font-family: 'GT-America-Mono';
+            border: 1px solid #0052CC;
+            padding: 10px;
+            border-radius: 4px;
+            background: none;
+            color: #000;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #0052CC;
+            box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.15);
+        }
+        h2, h3 {
+            font-size: 26px;
+            font-family: 'GT-America-Mono';
+            margin: 15px 0;
+        }
+        .highlight { 
+            font-size: 110px; 
+            font-weight: bold; 
+            color: #0052CC; 
+            line-height: 140px;
+            text-align: center;
+        }
+        .spinner-viewport {
+            height: 140px;
+            overflow: hidden;
+            position: relative;
+            margin: 30px 0;
+        }
+        @keyframes snapBounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        .snap-animation {
+            animation: snapBounce 0.4s ease-out;
+            display: inline-block;
+        }
+        .sub-link { 
+            display: block; 
+            margin-top: 25px; 
+            color: #0052CC; 
+            text-decoration: underline; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-family: 'GT-America-Mono';
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-titles">
+            <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+            <h1>Feedback-Flaschendrehen</h1>
+        </div>
+    </div>
+
+    <div id="step1" class="card">
+        <div class="formula">
+            Feedback für <input type="text" id="targetInput" class="formula-input" placeholder="..." tabindex="1" autofocus>
+        </div>
+        
+        <h3>Von:</h3>
+        <textarea id="namesInput" placeholder="Namen der Feedbackgeber eingeben (einen pro Zeile)..." tabindex="2"></textarea>
+        <br>
+        <button id="submitBtn" onclick="startSpinning()" class="info-btn" style="margin-top: 20px;" tabindex="3">Los geht's!</button>
+    </div>
+
+    <div id="step2" class="card hidden">
+        <div class="formula" id="displayTarget" style="margin-bottom: 20px;">Feedback für ...</div>
+        <h3>Von:</h3>
+        
+        <div id="spinner-viewport" class="spinner-viewport">
+            <div id="spinnerDisplay" class="highlight">...</div>
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+            <button id="nextBtn" onclick="nextRound()" class="info-btn" style="visibility: hidden;">Nächster</button>
+            <button id="resetBtn" class="info-btn btn-red" onclick="resetApp()">Feedback von jemand anderem</button>
+        </div>
+    </div>
+
+    <div class="key-hints">
+        <div class="key-hint">esc</div>
+        <div class="key-hint key-arrow">⇥</div>
+        <div class="key-hint key-arrow">↩</div>
+    </div>
+
+    <script>
+        let feedbackGivers = [];
+        let currentTarget = "";
+
+        function adjustInputWidth(input) {
+            if (!input) return;
+            const length = input.value.length || input.placeholder.length || 1;
+            // Da monospace, können wir die Zeichenanzahl zur Breitenberechnung nutzen
+            input.style.width = (length * 34 + 30) + 'px';
+        }
+
+        function startSpinning() {
+            const targetVal = document.getElementById('targetInput').value.trim();
+            const namesVal = document.getElementById('namesInput').value.trim();
+
+            if (!targetVal || !namesVal) {
+                alert("Bitte gib einen Empfänger und mindestens einen Feedbackgeber ein!");
+                return;
+            }
+
+            // Namen aus der Textarea in ein Array umwandeln (Zeilenbrüche trennen)
+            feedbackGivers = namesVal.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+            currentTarget = targetVal;
+
+            if (feedbackGivers.length === 0) {
+                alert("Bitte gib gültige Namen ein.");
+                return;
+            }
+
+            // UI umschalten
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('displayTarget').innerText = `Feedback für ${currentTarget}`;
+            
+            runSpinnerAnimation();
+        }
+
+        function runSpinnerAnimation() {
+            const display = document.getElementById('spinnerDisplay');
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.style.visibility = "hidden";
+
+            if (feedbackGivers.length === 0) {
+                // Pool automatisch wieder auffüllen, wenn alle einmal dran waren
+                const namesVal = document.getElementById('namesInput').value.trim();
+                feedbackGivers = namesVal.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+            }
+
+            // Finale Auswahl: Wir ziehen die Person fest aus dem Array
+            const finalIndex = Math.floor(Math.random() * feedbackGivers.length);
+            const chosenOne = feedbackGivers.splice(finalIndex, 1)[0];
+
+            // Erstelle eine Liste von Namen für den Slot-Machine-Effekt
+            const currentName = display.innerText;
+            const items = [currentName];
+            const spinCount = 25; // Wie viele Namen "durchlaufen" sollen
+            const lineHeight = 140; // Muss mit CSS line-height übereinstimmen
+            
+            for (let i = 0; i < spinCount; i++) {
+                const randomName = feedbackGivers.length > 0 
+                    ? feedbackGivers[Math.floor(Math.random() * feedbackGivers.length)]
+                    : chosenOne;
+                items.push(randomName);
+            }
+            items.push(chosenOne); // Der Gewinner steht am Ende der Liste
+
+            // UI für die Animation vorbereiten
+            display.innerHTML = items.map(name => `<div style="height: ${lineHeight}px;">${name}</div>`).join('');
+            display.style.transition = "none";
+            display.style.transform = "translateY(0)";
+            display.style.color = "#f2ff00";
+
+            // Animation auslösen (mit kurzem Timeout, damit der Browser den Reset registriert)
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    display.style.transition = "transform 2.5s cubic-bezier(0.1, 0, 0.1, 1)";
+                    display.style.transform = `translateY(-${(items.length - 1) * lineHeight}px)`;
+                }, 20);
+            });
+
+            // Nach Abschluss der Animation aufräumen
+            setTimeout(() => {
+                display.style.transition = "none";
+                display.style.transform = "translateY(0)";
+                
+                // Name einsetzen und Animation triggern
+                display.innerHTML = `<span class="snap-animation">${chosenOne}</span>`;
+                
+                display.style.color = "#0052CC";
+                nextBtn.style.visibility = "visible";
+            }, 2600);
+        }
+
+        function nextRound() {
+            runSpinnerAnimation();
+        }
+
+        function resetApp() {
+            // Alles zurücksetzen für eine komplett neue Runde
+            const targetInput = document.getElementById('targetInput');
+            targetInput.value = "";
+            adjustInputWidth(targetInput);
+            document.getElementById('namesInput').value = "";
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('spinnerDisplay').innerText = "...";
+            document.getElementById('spinnerDisplay').style.color = "#0052CC";
+            setTimeout(() => targetInput.focus(), 50);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const targetInput = document.getElementById('targetInput');
+            const namesInput = document.getElementById('namesInput');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (targetInput) {
+                targetInput.addEventListener('input', () => adjustInputWidth(targetInput));
+                targetInput.addEventListener('focus', () => targetInput.select());
+                adjustInputWidth(targetInput);
+            }
+
+            // Fokus-Loop für step1 (verhindert das Ausbrechen aus dem Formular)
+            if (targetInput && namesInput && submitBtn) {
+                submitBtn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                        e.preventDefault();
+                        targetInput.focus();
+                    }
+                });
+
+                targetInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Tab' && e.shiftKey) {
+                        e.preventDefault();
+                        submitBtn.focus();
+                    }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        namesInput.focus();
+                    }
+                });
+            }
+
+            // Fokus-Loop für step2 (Ergebnis & Reset-Button)
+            const nextBtn = document.getElementById('nextBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            if (nextBtn && resetBtn) {
+                resetBtn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                        if (nextBtn.style.visibility !== 'hidden') {
+                            e.preventDefault();
+                            nextBtn.focus();
+                        }
+                    }
+                });
+
+                nextBtn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Tab' && e.shiftKey) {
+                        e.preventDefault();
+                        resetBtn.focus();
+                    }
+                });
+            }
+
+            // Zurück zur Hauptseite mit Escape-Taste (keyup wird in Firefox nicht blockiert)
+            document.addEventListener('keyup', function (e) {
+                if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

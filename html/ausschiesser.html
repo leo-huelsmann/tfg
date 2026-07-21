@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ausschießen - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px); /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px; /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left column menu */
+    .menu-column {
+      width: 320px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 15px;
+      user-select: none;
+    }
+
+    .menu-item {
+      font-family: 'GT-America-Mono';
+      font-size: clamp(13px, 1.0vw, 18px);
+      font-weight: 500;
+      color: #222;
+      background-color: #e2e2e2;
+      padding: 16px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s, transform 0.15s, color 0.2s;
+      border-radius: 2px;
+    }
+
+    .menu-item.active {
+      background-color: #f2ff00;
+      color: #000;
+      font-weight: bold;
+      transform: translateX(6px);
+      box-shadow: -4px 0 0 #0052CC;
+    }
+
+    .menu-item:hover:not(.active) {
+      background-color: rgba(242, 255, 0, 0.4);
+      transform: translateX(3px);
+    }
+
+    /* Right column content display */
+    .content-column {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 15px; /* For scrollbar gap */
+    }
+
+    /* Custom Scrollbar for premium look */
+    .content-column::-webkit-scrollbar {
+      width: 6px;
+    }
+    .content-column::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb {
+      background: #0052CC;
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb:hover {
+      background: #ff0059;
+    }
+
+    /* Content styling */
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100%;
+    }
+
+    .guide-title {
+      font-size: clamp(24px, 2.2vw, 42px);
+      font-weight: bold;
+      color: #0052CC;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .guide-subtitle {
+      font-size: clamp(14px, 1.0vw, 18px);
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .guide-details-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .details-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .guide-section-title {
+      font-size: clamp(15px, 1.1vw, 20px);
+      color: #0052CC;
+      font-weight: bold;
+      border-bottom: 1px dashed #0052CC;
+      padding-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .materials-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .materials-list li {
+      background-color: #e2e2e2;
+      color: #333;
+      padding: 6px 12px;
+      font-size: clamp(11px, 0.8vw, 14px);
+      border-radius: 4px;
+      border: 1px solid #d2d2d2;
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .steps-list li {
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 18px;
+      font-size: clamp(13px, 0.95vw, 16px);
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .steps-list li::before {
+      content: counter(step-counter) ".";
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #0052CC;
+      font-weight: bold;
+      font-size: clamp(14px, 1.0vw, 18px);
+    }
+
+    /* Right pane image styling */
+    .details-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+    }
+
+    .image-container {
+      border: 1px solid #0052CC;
+      padding: 16px;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      max-height: 40vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Content Fade-in Animation */
+    .content-animate {
+      animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+        padding-bottom: 100px;
+      }
+      .menu-column {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .menu-item {
+        flex: 1 1 45%;
+        padding: 12px 15px;
+      }
+      .content-column {
+        overflow-y: visible;
+        padding-right: 0;
+      }
+      .guide-details-grid {
+        grid-template-columns: 1fr;
+      }
+      .details-right {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Ausschießen & Druckvorbereitung</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Links: Navigation -->
+    <div class="menu-column" id="menu-column">
+      <!-- Wird dynamisch befüllt -->
+    </div>
+
+    <!-- Rechts: Anleitungsinhalt -->
+    <div class="content-column">
+      <div id="guide-content" class="guide-content">
+        <!-- Wird dynamisch befüllt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Hints am Fuß -->
+  <div class="key-hints">
+    <div class="key-hint">Esc</div>
+    <div class="key-hint key-arrow">↑</div>
+    <div class="key-hint key-arrow">↓</div>
+    <div class="key-hint">1-4</div>
+  </div>
+
+  <script>
+    const guides = [
+      {
+        title: "Grundlagen",
+        subtitle: "Was ist Ausschießen und wozu dient es?",
+        materials: ["Einzelblatt-PDF (fortlaufend)", "Druckbogen-Format", "Falzschema", "Rasterlineal"],
+        steps: [
+          "Erzeuge ein PDF, in dem alle Seiten einzeln und fortlaufend (1, 2, 3...) vorliegen. Exportiere niemals Doppelseiten!",
+          "Bestimme das Endformat deines Buchs (z. B. A5) und das Druckbogenformat deiner Druckerei (z. B. A3 oder SRA3).",
+          "Berechne, wie viele Seiten auf einen Bogen passen (z. B. A5 auf A3 = 4 Seiten pro Bogenseite, 8 Seiten Vorder-/Rückseite).",
+          "Berücksichtige das Falzschema: Beim Falzen drehen sich Seiten um 90 oder 180 Grad. Im Ausschieß-Layout müssen diese entsprechend rotiert werden.",
+          "Achte auf absolute Passgenauigkeit (Deckungsgleichheit) von Vorderseite (Schöndruck) und Rückseite (Widerdruck)."
+        ],
+        image: "../assets/img/ausschiesser_grundlagen.png"
+      },
+      {
+        title: "Fadenheftung",
+        subtitle: "Lagen-Ausschießen für geheftete Broschüren",
+        materials: ["Heftlagen-Plan", "Lagengröße (meist 4er-Schritte)", "Ausschieß-Software oder InDesign-Booklet"],
+        steps: [
+          "Teile die Gesamtseitenzahl deines Buches durch die gewünschte Lagengröße (z. B. 16 Seiten pro Lage).",
+          "Wichtig: Die Gesamtseitenzahl des Buches muss immer durch 4 teilbar sein, um leere Seiten am Ende zu vermeiden.",
+          "Für jede Lage gilt: Die erste und die letzte Seite liegen auf demselben Bogen (z. B. bei einer 8-seitigen Lage liegen 8 & 1 außen, 2 & 7 innen).",
+          "Berechne den Bundzuwachs (Verdrängung): Da innere Bögen durch die Papierdicke nach außen wandern, müssen die inneren Seiten minimal nach innen verschoben werden (ca. 0,1-0,3 mm pro Bogen).",
+          "Exportiere jede Lage als eigenständiges, ausgeschossenes Heft-Dokument für den Druck."
+        ],
+        image: "../assets/img/ausschiesser_fadenheftung.png"
+      },
+      {
+        title: "Klebebindung",
+        subtitle: "Einzelblatt-Ausschießen für klebegebundene Bücher",
+        materials: ["Einzelblatt-Block", "Fräsrand-Zugabe (2-3 mm)", "Leimspur-Freihaltung", "Breiter Innensteg"],
+        steps: [
+          "Beachte den Fräsanschnitt am Rückenbund (meist 2 bis 3 mm). Dieser Bereich wird vor dem Leimen abgefräst/aufgeraut.",
+          "Die Seitenreihenfolge ist hier linearer: Seite 1 und 2 werden als Vorder- und Rückseite auf dasselbe Blatt gedruckt.",
+          "Nutze Mehrfachnutzen (z. B. 2x Seite 1 & 2 nebeneinander auf einem Bogen), um Papier und Druckgänge optimal auszunutzen.",
+          "Plane einen breiteren Innensteg (Rand) ein, da durch die Klebung und das Aufschlagverhalten Text nahe am Rücken schlechter lesbar ist.",
+          "Exportiere den Umschlag als separates Dokument und berechne die Rückenstärke passend (siehe Buchrücken-Rechner)."
+        ],
+        image: "../assets/img/ausschiesser_klebebindung.png"
+      },
+      {
+        title: "Druckvorbereitung",
+        subtitle: "Schnittmarken, Anschnitt & Export-Vorgaben",
+        materials: ["Anschnitt (mind. 3 mm)", "Schnittmarken (3 mm Versatz)", "Passermarken", "PDF/X-4 Exportprofil"],
+        steps: [
+          "Lege in deinem Layout-Programm (z. B. InDesign) einen Anschnitt von mindestens 3 mm an allen Außenkanten an.",
+          "Ziehe alle Bilder und Farbflächen, die bis an den Papierrand gehen sollen, komplett über die Seitenkante hinaus bis an die Anschnittlinie.",
+          "Aktiviere beim PDF-Export die Schnittmarken (Trim Marks). Diese zeigen der Druckerei, wo das Papier geschnitten werden muss.",
+          "Stelle die Schnittmarken auf einen Versatz von mindestens 3 mm ein, damit sie nicht im Anschnittbereich liegen.",
+          "Exportiere im Standard PDF/X-3:2002 oder PDF/X-4, um Farbprofile (z. B. CMYK ECI-ISO Coated) einzubetten."
+        ],
+        image: "../assets/img/ausschiesser_vorbereitung.png"
+      }
+    ];
+
+    let activeIndex = 0;
+
+    function renderMenu() {
+      const menuColumn = document.getElementById('menu-column');
+      menuColumn.innerHTML = '';
+      guides.forEach((guide, index) => {
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'menu-item';
+        if (index === activeIndex) item.className += ' active';
+        
+        // Format index as 01, 02, etc.
+        const num = String(index + 1).padStart(2, '0');
+        item.textContent = `${num}. ${guide.title}`;
+        
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectGuide(index);
+        });
+        menuColumn.appendChild(item);
+      });
+    }
+
+    function selectGuide(index) {
+      activeIndex = index;
+      renderMenu();
+
+      const guide = guides[activeIndex];
+      const contentEl = document.getElementById('guide-content');
+
+      // Reset animation
+      contentEl.classList.remove('content-animate');
+      void contentEl.offsetWidth; // Trigger reflow
+
+      const materialsHTML = guide.materials.map(m => `<li>${m}</li>`).join('');
+      const stepsHTML = guide.steps.map(s => `<li>${s}</li>`).join('');
+
+      contentEl.innerHTML = `
+        <h2 class="guide-title">${guide.title}</h2>
+        <div class="guide-subtitle">${guide.subtitle}</div>
+        
+        <div class="guide-details-grid">
+          <div class="details-left">
+            <span class="guide-section-title">Anforderungen</span>
+            <ul class="materials-list">
+              ${materialsHTML}
+            </ul>
+            
+            <span class="guide-section-title">Anleitung</span>
+            <ol class="steps-list" style="counter-reset: step-counter;">
+              ${stepsHTML}
+            </ol>
+          </div>
+          <div class="details-right">
+            <div class="image-container">
+              <img src="${guide.image}" alt="Illustration ${guide.title}">
+            </div>
+          </div>
+        </div>
+      `;
+
+      contentEl.classList.add('content-animate');
+    }
+
+    // Tastatursteuerung
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        const next = (activeIndex + 1) % guides.length;
+        selectGuide(next);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        const prev = (activeIndex - 1 + guides.length) % guides.length;
+        selectGuide(prev);
+      } else if (e.key >= '1' && e.key <= '4') {
+        const index = parseInt(e.key) - 1;
+        if (index >= 0 && index < guides.length) {
+          selectGuide(index);
+        }
+      }
+    });
+
+    // Escape-Taste bringt zurück zur Hauptseite
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', () => {
+      selectGuide(0);
+    });
+  </script>
+</body>
+
+</html>

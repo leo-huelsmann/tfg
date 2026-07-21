@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tool hinzufügen - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px); /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px; /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left panel: Disabled Form */
+    .controls-panel {
+      width: 380px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      opacity: 0.55; /* Ghostly disabled state */
+      pointer-events: none; /* Deactivate interaction */
+      user-select: none;
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+      padding-right: 15px;
+    }
+
+    /* Right panel: Info text and spiky coming soon badge */
+    .info-panel {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .info-card {
+      background-color: #ffffff;
+      border: 1px solid #d2d2d2;
+      border-radius: 4px;
+      padding: 40px;
+      max-width: 500px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      text-align: center;
+      position: relative;
+      transform: rotate(-1.5deg); /* Tilt the card as requested */
+    }
+
+    .coming-soon-badge-container {
+      position: absolute;
+      bottom: -45px;
+      left: -45px;
+      z-index: 10;
+    }
+
+    .info-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #444;
+      margin: 0 0 30px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* Inputs styling consistent with rest of the site */
+    .input-field {
+      width: 100%;
+      border: none;
+      border-bottom: 2px dashed #999;
+      background: transparent;
+      padding: 8px 0;
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 15px;
+      color: #999;
+      outline: none;
+    }
+
+    /* Custom spiky badge animation */
+    @keyframes pulseBadge {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .coming-soon-badge {
+      animation: pulseBadge 3s ease-in-out infinite;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+    }
+
+    /* Responsive */
+    @media (max-width: 950px) {
+      .main-container {
+        flex-direction: column-reverse;
+        overflow-y: auto;
+        height: auto;
+        padding-bottom: 100px;
+      }
+      .controls-panel {
+        width: 100%;
+        border-right: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        padding-top: 24px;
+        padding-right: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Eigenes Tool hinzufügen</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- LEFT PANEL: DISABLED PREVIEW FORM -->
+    <div class="controls-panel">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; font-weight: bold; margin-bottom: -10px;">Tool Konfiguration</div>
+      
+      <div>
+        <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; font-weight: bold;">Name des Web-Tools</label>
+        <input type="text" class="input-field" value="" placeholder="z. B. Figma" disabled />
+      </div>
+
+      <div>
+        <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; font-weight: bold;">Web-Link (URL)</label>
+        <input type="text" class="input-field" value="" placeholder="https://figma.com" disabled />
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button type="button" class="info-btn" style="width: 100%; text-transform: uppercase; background-color: #e2e2e2; border-color: #d2d2d2; color: #999; cursor: not-allowed;" disabled>Tool Speichern</button>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div class="info-card">
+        <p>
+          Dieses Feature ermöglicht es dir bald, beliebige externe Web-Tools oder Lesezeichen direkt als neue Kacheln in das rotierende Hauptkarussell einzubetten. So kannst du dir deine ganz persönliche Werkzeugkiste zusammenstellen.
+        </p>
+        
+        <!-- COMING SOON BADGE (Yellow spiky circle on the bottom-left corner) -->
+        <div class="coming-soon-badge-container">
+          <svg class="coming-soon-badge" xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 160 160">
+            <path id="spiky-path" fill="#F2FF00" stroke="none" />
+            <text x="80" y="75" font-family="'GT-America-Mono', monospace" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="0.04em">COMING</text>
+            <text x="80" y="90" font-family="'GT-America-Mono', monospace" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="0.04em">SOON</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+  </div>
+
+  <script>
+    // Generate mathematically perfect circular starburst shape
+    function generateSpikyPath(points, rOuter, rInner) {
+      let path = "";
+      const cx = 80;
+      const cy = 80;
+      const totalPoints = points * 2;
+      for (let i = 0; i < totalPoints; i++) {
+        const angle = (i * 2 * Math.PI) / totalPoints - Math.PI / 2;
+        const r = (i % 2 === 0) ? rOuter : rInner;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        if (i === 0) {
+          path += `M ${x.toFixed(1)} ${y.toFixed(1)}`;
+        } else {
+          path += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+      }
+      path += " Z";
+      return path;
+    }
+
+    // Escape redirects to landing page
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Initialize spiky path on load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('spiky-path').setAttribute('d', generateSpikyPath(24, 76, 62));
+    });
+  </script>
+</body>
+</html>

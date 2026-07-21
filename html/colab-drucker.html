@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colab Drucker - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px);
+      /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px;
+      /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left column menu */
+    .menu-column {
+      width: 320px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 12px;
+      user-select: none;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .menu-item {
+      font-family: 'GT-America-Mono';
+      font-size: clamp(13px, 1.0vw, 17px);
+      font-weight: 500;
+      color: #222;
+      background-color: #e2e2e2;
+      padding: 14px 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s, transform 0.15s, color 0.2s;
+      border-radius: 2px;
+    }
+
+    .menu-item.active {
+      background-color: #f2ff00;
+      color: #000;
+      font-weight: bold;
+      transform: translateX(6px);
+      box-shadow: -4px 0 0 #0052CC;
+    }
+
+    .menu-item:hover:not(.active) {
+      background-color: rgba(242, 255, 0, 0.4);
+      transform: translateX(3px);
+    }
+
+    /* Right column content display */
+    .content-column {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 15px;
+      /* For scrollbar gap */
+    }
+
+    /* Custom Scrollbar for premium look */
+    .content-column::-webkit-scrollbar,
+    .menu-column::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .content-column::-webkit-scrollbar-track,
+    .menu-column::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    .content-column::-webkit-scrollbar-thumb,
+    .menu-column::-webkit-scrollbar-thumb {
+      background: #0052CC;
+      border-radius: 10px;
+    }
+
+    .content-column::-webkit-scrollbar-thumb:hover,
+    .menu-column::-webkit-scrollbar-thumb:hover {
+      background: #ff0059;
+    }
+
+    /* Content styling */
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100%;
+    }
+
+    .guide-title {
+      font-size: clamp(22px, 2.0vw, 38px);
+      font-weight: bold;
+      color: #0052CC;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .guide-subtitle {
+      font-size: clamp(14px, 1.0vw, 17px);
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .guide-details-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .guide-section-title {
+      font-size: clamp(15px, 1.1vw, 20px);
+      color: #0052CC;
+      font-weight: bold;
+      border-bottom: 1px dashed #0052CC;
+      padding-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: step-counter;
+    }
+
+    .steps-list li {
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 16px;
+      font-size: clamp(13px, 0.95vw, 15px);
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .steps-list li::before {
+      content: counter(step-counter) ".";
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #0052CC;
+      font-weight: bold;
+      font-size: clamp(14px, 1.0vw, 17px);
+    }
+
+    /* Content Fade-in Animation */
+    .content-animate {
+      animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Info card layout */
+    .info-card {
+      border: 1px solid #d2d2d2;
+      background-color: #ffffff;
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eeeeee;
+      padding-bottom: 8px;
+      font-size: clamp(12px, 0.9vw, 15px);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .info-value {
+      color: #111;
+      text-align: right;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+        padding-bottom: 100px;
+      }
+
+      .menu-column {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-y: visible;
+        padding-right: 0;
+      }
+
+      .menu-item {
+        flex: 1 1 45%;
+        padding: 12px 15px;
+      }
+
+      .content-column {
+        overflow-y: visible;
+        padding-right: 0;
+      }
+
+      .guide-details-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link">
+        <h1>← tools für gestalter:innen</h1>
+      </a>
+      <h1>Colab-Drucker</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Links: Menu -->
+    <div class="menu-column" id="menu-column">
+      <!-- Wird dynamisch befüllt -->
+    </div>
+
+    <!-- Rechts: Content -->
+    <div class="content-column">
+      <div id="guide-content" class="guide-content">
+        <!-- Wird dynamisch befüllt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Hints am Fuß -->
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+    <div class="key-hint key-arrow">↑</div>
+    <div class="key-hint key-arrow">↓</div>
+    <div class="key-hint">1-3</div>
+  </div>
+
+  <script>
+    const pages = [
+      {
+        title: "Installation auf macOS",
+        subtitle: "Einrichtung im Hochschulnetzwerk",
+        type: "guide",
+        steps: [
+          "Treiber herunterladen: Wähle den gewünschten Drucker im linken Menü aus und lade den passenden macOS-Treiber über den Link herunter. Installiere das Treiberpaket.",
+          "Systemeinstellungen öffnen: Klicke auf das Apple-Logo oben links, gehe zu 'Systemeinstellungen' (oder 'Systempräferenzen') und wähle den Bereich 'Drucker & Scanner'.",
+          "Drucker hinzufügen: Klicke unten links in der Druckerliste auf das '+'-Symbol (Drucker, Scanner oder Fax hinzufügen...).",
+          "IP-Reiter auswählen: Klicke im neuen Fenster auf das IP-Symbol (die Weltkugel-Schaltfläche) in der oberen Symbolleiste.",
+          "IP-Verbindung konfigurieren: Trage die Adresse des gewünschten Druckers ein. IP-Adresse Kyocera: -- | IP-Adresse Lexmark: -- (Werte exemplarisch für das Hochschulnetz).",
+          "Protokoll festlegen: Wähle als Protokoll 'Line Printer Daemon - LPD' aus. Die Warteschlange kann leer gelassen werden.",
+          "Treiber zuweisen: Wähle unter 'Verwenden' die Option 'Software auswählen...' und suche nach der genauen Modellbezeichnung (z. B. 'Kyocera ECOSYS P4060dn' oder 'Lexmark MS911de').",
+          "Abschließen & Zubehör: Klicke auf 'Hinzufügen'. Bestätige im darauf folgenden Dialog optionale Zubehör-Features wie Duplexeinheiten, Finisher oder zusätzliche Papierfächer."
+        ]
+      },
+      {
+        title: "Kyocera ECOSYS P4060dn",
+        subtitle: "A3/A4 Schwarzweiß-Hochleistungsdrucker",
+        type: "printer",
+        specs: [
+          { label: "IP-Adresse", value: "-- (Colab Netz)" },
+          { label: "Format", value: "A4, A3, SRA3, Banner" },
+          { label: "Geschwindigkeit", value: "Bis zu 60 Seiten A4 / 30 Seiten A3 pro Minute" },
+          { label: "Auflösung", value: "1200 x 1200 dpi" },
+          { label: "Besonderheiten", value: "Duplex-Einheit, extra Großraumkassette, extrem langlebige Komponenten" }
+        ],
+        driverLink: "https://www.kyoceradocumentsolutions.de/de/support/downloads.name-L2RlL2RlL3NlcnZpY2UvZG93bmxvYWRzL2RldGFpbHMvRUNPU1lTUDQwNjBEbg==.html",
+        driverBtnLabel: "Kyocera Download Center ↗"
+      },
+      {
+        title: "Lexmark MS911de",
+        subtitle: "A3/A4 SW-Arbeitsgruppendrucker",
+        type: "printer",
+        specs: [
+          { label: "IP-Adresse", value: "-- (Colab Netz)" },
+          { label: "Format", value: "A4, A3" },
+          { label: "Geschwindigkeit", value: "Bis zu 55 Seiten pro Minute" },
+          { label: "Auflösung", value: "1200 x 1200 dpi" },
+          { label: "Besonderheiten", value: "Farbbildschirm, Hefter-Finisher (optional), integrierter Webserver" }
+        ],
+        driverLink: "https://support.lexmark.com/de_de/drivers-downloads.html?q=Lexmark%20MS911de",
+        driverBtnLabel: "Lexmark Support Portal ↗"
+      }
+    ];
+
+    let activeIndex = 0;
+
+    function renderMenu() {
+      const menuColumn = document.getElementById('menu-column');
+      menuColumn.innerHTML = '';
+
+      pages.forEach((page, index) => {
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'menu-item';
+        if (index === activeIndex) item.className += ' active';
+
+        const num = String(index + 1).padStart(2, '0');
+        item.textContent = `${num}. ${page.title}`;
+
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectPage(index);
+        });
+        menuColumn.appendChild(item);
+      });
+    }
+
+    function selectPage(index) {
+      activeIndex = index;
+      renderMenu();
+
+      const page = pages[activeIndex];
+      const contentEl = document.getElementById('guide-content');
+
+      // Reset animation
+      contentEl.classList.remove('content-animate');
+      void contentEl.offsetWidth; // Trigger reflow
+
+      let contentHTML = '';
+
+      if (page.type === 'guide') {
+        contentHTML = `
+          <h2 class="guide-title">${page.title}</h2>
+          <div class="guide-subtitle">${page.subtitle}</div>
+          <div>
+            <span class="guide-section-title">Schritt-für-Schritt-Anleitung</span>
+            <ol class="steps-list" style="margin-top: 15px;">
+              ${page.steps.map(step => `<li>${step}</li>`).join('')}
+            </ol>
+          </div>
+        `;
+      } else if (page.type === 'printer') {
+        const specRows = page.specs.map(spec => `
+          <div class="info-row">
+            <span class="info-label">${spec.label}</span>
+            <span class="info-value">${spec.value}</span>
+          </div>
+        `).join('');
+
+        contentHTML = `
+          <h2 class="guide-title">${page.title}</h2>
+          <div class="guide-subtitle">${page.subtitle}</div>
+          
+          <div class="guide-details-grid">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <span class="guide-section-title">Technische Details</span>
+                <div class="info-card" style="margin-top: 15px;">
+                  ${specRows}
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <span class="guide-section-title">Treiber-Download</span>
+                <p style="font-size: 14px; color: #555; line-height: 1.5; margin: 15px 0;">
+                  Um diesen Drucker zu verwenden, lade bitte den offiziellen macOS-Treiber direkt vom Hersteller herunter.
+                </p>
+                <div style="margin-top: 10px;">
+                  <a href="${page.driverLink}" target="_blank" class="info-btn" style="pointer-events: auto; text-decoration: none; text-transform: uppercase;">
+                    ${page.driverBtnLabel}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      contentEl.innerHTML = contentHTML;
+      contentEl.classList.add('content-animate');
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        const next = (activeIndex + 1) % pages.length;
+        selectPage(next);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        const prev = (activeIndex - 1 + pages.length) % pages.length;
+        selectPage(prev);
+      } else if (e.key >= '1' && e.key <= '3') {
+        const index = parseInt(e.key) - 1;
+        if (index >= 0 && index < pages.length) {
+          selectPage(index);
+        }
+      }
+    });
+
+    // Escape redirects to landing page
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      selectPage(0);
+    });
+  </script>
+</body>
+
+</html>

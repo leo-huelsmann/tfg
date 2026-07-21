@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>buchruecken</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-titles">
+            <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+            <h1>Buchrücken-Stärke-Rechner</h1>
+        </div>
+    </div>
+
+    <div class="formula-calculator">
+        <div class="formula">
+            (<input type="number" id="seitenanzahl" class="formula-input" value="0" autofocus tabindex="1"> Seiten ÷ 2)<br>
+            × ((<input type="number" id="papiergewicht" class="formula-input" value="0" tabindex="2"> g/m² ÷ 1000)<br>
+            × Papiervolumen <input type="number" id="papiervolumen" class="formula-input" value="0" tabindex="3">) + 1,5mm<br>
+            = <span id="resultat">00,00mm</span>
+        </div>
+    </div>
+
+    <div class="key-hints">
+        <div class="key-hint">c</div>
+        <div class="key-hint">esc</div>
+        <div class="key-hint key-arrow">⇥</div>
+    </div>
+
+    <script src="../javascript/buchruecken.js"></script>
+</body>
+
+</html>

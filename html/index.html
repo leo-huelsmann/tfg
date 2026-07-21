@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tfg</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .block-description {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      font-family: 'GT-America-Mono', monospace;
+      font-size: clamp(10px, 0.65vw, 14px);
+      color: #555;
+      max-width: 300px;
+      text-align: right;
+      text-transform: uppercase;
+      line-height: 1.5;
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .block-description.visible {
+      opacity: 1;
+    }
+
+    /* Custom hover styling with zoomed-in preview images (Temporarily commented out)
+    .block {
+      background-color: transparent !important;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      overflow: hidden;
+      border-radius: 4px;
+      transition: transform 0.15s ease-out, background 0.3s, opacity 0.15s, box-shadow 0.15s;
+    }
+
+    .block.is-front {
+      background-color: transparent !important;
+    }
+
+    .block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #e2e2e2;
+      z-index: 1;
+      transition: opacity 0.25s ease;
+      border-radius: inherit;
+    }
+
+    .block.is-front::before {
+      background-color: #f2ff00;
+    }
+
+    .block-text {
+      position: relative;
+      z-index: 2;
+      transition: background-color 0.25s, color 0.25s, padding 0.25s, border-radius 0.25s, border 0.25s, box-shadow 0.25s;
+    }
+
+    .block:hover::before {
+      opacity: 0;
+    }
+
+    .block:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .block:hover .block-text {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #000 !important;
+      padding: 6px 14px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      font-size: clamp(9px, 0.55vw, 13px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      display: inline-block;
+      max-width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .block-buchruecken:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f5f5f5'/><line x1='70' y1='0' x2='70' y2='155' stroke='%23ff0059' stroke-width='4' stroke-dasharray='5,5'/><text x='35' y='85' font-family='monospace' font-weight='bold' font-size='20' fill='%230052CC' text-anchor='middle'>14</text><text x='105' y='85' font-family='monospace' font-weight='bold' font-size='20' fill='%230052CC' text-anchor='middle'>mm</text></svg>");
+    }
+    .block-feedbackrunden:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23E9ECEF'/><rect x='10' y='20' width='120' height='50' rx='4' fill='white' stroke='%2334C759' stroke-width='2'/><circle cx='25' cy='35' r='6' fill='%2334C759'/><line x1='40' y1='35' x2='110' y2='35' stroke='%23ccc' stroke-width='4'/><rect x='10' y='85' width='120' height='50' rx='4' fill='white' stroke='%23FF3B30' stroke-width='2'/><circle cx='25' cy='100' r='6' fill='%23FF3B30'/><line x1='40' y1='100' x2='110' y2='100' stroke='%23ccc' stroke-width='4'/></svg>");
+    }
+    .block-fliesenscan:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23fafafa'/><rect x='10' y='15' width='55' height='55' fill='%23FF9500'/><rect x='75' y='15' width='55' height='55' fill='%230052CC'/><rect x='10' y='80' width='55' height='55' fill='%2334C759'/><rect x='75' y='80' width='55' height='55' fill='%23FF3B30'/></svg>");
+    }
+    .block-ausschiesser:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f0f0f0'/><rect x='15' y='20' width='50' height='50' fill='white' stroke='%23222' stroke-width='1'/><text x='40' y='52' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle'>1</text><rect x='75' y='20' width='50' height='50' fill='white' stroke='%23222' stroke-width='1'/><text x='100' y='52' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' transform='rotate(180 100 47)'>8</text><rect x='15' y='80' width='50' height='50' fill='white' stroke='%23222' stroke-width='1'/><text x='40' y='112' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle' transform='rotate(180 40 107)'>5</text><rect x='75' y='80' width='50' height='50' fill='white' stroke='%23222' stroke-width='1'/><text x='100' y='112' font-family='sans-serif' font-size='18' font-weight='bold' text-anchor='middle'>4</text></svg>");
+    }
+    .block-anleitungen:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23FAF8F5'/><path d='M20,40 Q40,10 60,40 T100,40 T120,40' fill='none' stroke='%23AF52DE' stroke-width='3'/><path d='M20,90 Q40,60 60,90 T100,90 T120,90' fill='none' stroke='%23FF9500' stroke-width='3'/><circle cx='40' cy='40' r='3' fill='black'/><circle cx='80' cy='40' r='3' fill='black'/><circle cx='40' cy='90' r='3' fill='black'/><circle cx='80' cy='90' r='3' fill='black'/></svg>");
+    }
+    .block-skizzelogo:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23fefefe'/><path d='M 10 130 C 40 10, 100 10, 130 130' fill='none' stroke='%23888' stroke-width='1' stroke-dasharray='2,2'/><path d='M 10 130 C 40 10, 100 10, 130 130' fill='none' stroke='%23000' stroke-width='3'/><circle cx='40' cy='50' r='4' fill='%230052CC'/><line x1='10' y1='130' x2='40' y2='50' stroke='%230052CC' stroke-width='1'/><circle cx='100' cy='50' r='4' fill='%230052CC'/><line x1='130' y1='130' x2='100' y2='50' stroke='%230052CC' stroke-width='1'/></svg>");
+    }
+    .block-mindmap:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f9f9f9'/><line x1='35' y1='45' x2='105' y2='45' stroke='%23222' stroke-width='1.5'/><line x1='35' y1='45' x2='70' y2='105' stroke='%23222' stroke-width='1.5'/><line x1='105' y1='45' x2='70' y2='105' stroke='%23222' stroke-width='1.5'/><circle cx='35' cy='45' r='12' fill='%23AF52DE'/><circle cx='105' cy='45' r='12' fill='%2334C759'/><circle cx='70' cy='105' r='16' fill='%230052CC'/></svg>");
+    }
+    .block-druckereien:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f8f8f8'/><rect x='10' y='20' width='120' height='25' fill='%23f2ff00' opacity='0.7'/><line x1='10' y1='20' x2='130' y2='20' stroke='%23222' stroke-width='1'/><line x1='10' y1='45' x2='130' y2='45' stroke='%23222' stroke-width='1'/><rect x='10' y='55' width='120' height='25' fill='%23e2e2e2'/><line x1='10' y1='55' x2='130' y2='55' stroke='%23222' stroke-width='1'/><line x1='10' y1='80' x2='130' y2='80' stroke='%23222' stroke-width='1'/><rect x='10' y='90' width='120' height='25' fill='%230052CC' opacity='0.2'/><line x1='10' y1='90' x2='130' y2='90' stroke='%23222' stroke-width='1'/><line x1='10' y1='115' x2='130' y2='115' stroke='%23222' stroke-width='1'/></svg>");
+    }
+    .block-ideensammler:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f6f6f6'/><line x1='35' y1='40' x2='100' y2='105' stroke='%23888' stroke-width='1' stroke-dasharray='3,3'/><rect x='10' y='25' width='60' height='22' rx='11' fill='%23FF3B30'/><rect x='65' y='95' width='65' height='22' rx='11' fill='%230052CC'/></svg>");
+    }
+    .block-workload:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f4f4f4'/><rect x='20' y='30' width='25' height='95' rx='3' fill='white' stroke='%23ccc'/><rect x='20' y='65' width='25' height='60' rx='3' fill='%2334C759'/><rect x='57' y='30' width='25' height='95' rx='3' fill='white' stroke='%23ccc'/><rect x='57' y='45' width='25' height='80' rx='3' fill='%23FF9500'/><rect x='95' y='30' width='25' height='95' rx='3' fill='white' stroke='%23ccc'/><rect x='95' y='90' width='25' height='35' rx='3' fill='%230052CC'/></svg>");
+    }
+    .block-projekt:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f5f5f5'/><rect x='10' y='25' width='70' height='16' rx='3' fill='%23AF52DE'/><rect x='50' y='55' width='80' height='16' rx='3' fill='%230052CC'/><rect x='25' y='85' width='90' height='16' rx='3' fill='%2334C759'/><rect x='10' y='115' width='60' height='16' rx='3' fill='%23FF3B30'/></svg>");
+    }
+    .block-colab:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f2f2f2'/><rect x='15' y='15' width='110' height='30' rx='2' fill='%2334C759' opacity='0.8'/><text x='25' y='33' font-family='monospace' font-size='10' fill='white'>10:00 - BUSY</text><rect x='15' y='55' width='110' height='30' rx='2' fill='%23FF3B30' opacity='0.8'/><text x='25' y='73' font-family='monospace' font-size='10' fill='white'>12:00 - LOCK</text><rect x='15' y='95' width='110' height='30' rx='2' fill='%230052CC' opacity='0.8'/><text x='25' y='113' font-family='monospace' font-size='10' fill='white'>14:00 - FREE</text></svg>");
+    }
+    .block-font:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23fff'/><text x='10' y='45' font-family='monospace' font-weight='bold' font-size='26' fill='black'>AaBbCc</text><text x='10' y='90' font-family='monospace' font-size='20' fill='%23555'>GgHhIi</text><text x='10' y='130' font-family='monospace' font-style='italic' font-size='16' fill='%23999'>123456</text></svg>");
+    }
+    .block-praesitimer:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f5f5f5'/><text x='70' y='95' font-family='monospace' font-weight='bold' font-size='38' fill='%230052CC' text-anchor='middle'>04:59</text><text x='70' y='130' font-family='monospace' font-size='10' fill='%23FF3B30' text-anchor='middle'>PERSON 1</text></svg>");
+    }
+    .block-farbcombos:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect x='0' y='0' width='47' height='155' fill='%230B2545'/><rect x='47' y='0' width='46' height='155' fill='%23EEF4F8'/><rect x='93' y='0' width='47' height='155' fill='%23F15A5A'/></svg>");
+    }
+    .block-farbkontraste:hover {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f5f5f5'/><circle cx='70' cy='85' r='60' fill='none' stroke='url(%23wheel-grad)' stroke-width='16'/><defs><linearGradient id='wheel-grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='red'/><stop offset='33%25' stop-color='yellow'/><stop offset='66%25' stop-color='blue'/><stop offset='100%25' stop-color='red'/></linearGradient></defs><line x1='40' y1='50' x2='100' y2='120' stroke='black' stroke-width='1.5' stroke-dasharray='3,3'/><circle cx='40' cy='50' r='5' fill='blue'/><circle cx='100' cy='120' r='5' fill='yellow'/></svg>");
+    }
+    */
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="info.html" class="header-back-link">
+        <h1>tools für gestalter:innen</h1>
+      </a>
+    </div>
+  </div>
+
+  <div class="ring-viewport">
+    <div class="ring-container" id="ring">
+      <a href="buchruecken.html" class="block block-buchruecken"><span class="block-text">buchrücken</span></a>
+      <a href="feedbackrunden.html" class="block block-feedbackrunden"><span
+          class="block-text">feedbackrunden</span></a>
+      <a href="ausschiesser.html" class="block block-ausschiesser"><span class="block-text">ausschießer</span></a>
+      <a href="anleitungen.html" class="block block-anleitungen"><span class="block-text">anleitungen zum
+          buchbinden</span></a>
+      <a href="../mindmap/mindmap.html" class="block block-mindmap"><span class="block-text">mindmap</span></a>
+      <a href="druckereien-vergleich.html" class="block block-druckereien"><span class="block-text">druckereien
+          vergleich</span></a>
+      <a href="ideensammler.html" class="block block-ideensammler"><span class="block-text">ideensammler</span></a>
+      <a href="workload-planer.html" class="block block-workload"><span class="block-text">workload-planer</span></a>
+      <a href="projekt-planer.html" class="block block-projekt"><span class="block-text">projekt-planer</span></a>
+      <a href="colab-drucker.html" class="block block-colab"><span class="block-text">colab drucker</span></a>
+      <a href="font-testsheet.html" class="block block-font"><span class="block-text">font testsheet</span></a>
+      <a href="praesi-timer.html" class="block block-praesitimer"><span class="block-text">präsi timer</span></a>
+      <a href="farb-combos.html" class="block block-farbcombos"><span class="block-text">farb-combos</span></a>
+      <a href="farbkontraste.html" class="block block-farbkontraste"><span class="block-text">farbkontraste</span></a>
+      <a href="tool-hinzufuegen.html" class="block block-addtool"><span class="block-text">eigenes tool
+          hinzufügen</span></a>
+    </div>
+  </div>
+
+  <div class="key-hints">
+    <div class="key-hint">scroll</div>
+    <div class="key-hint key-arrow">←</div>
+    <div class="key-hint key-arrow">→</div>
+    <div class="key-hint key-arrow">↩</div>
+  </div>
+
+  <!-- Container für die Beschreibung unten rechts -->
+  <div id="block-description" class="block-description"></div>
+
+  <script>
+    const blocks = document.querySelectorAll('.block');
+    const totalBlocks = blocks.length;
+
+    // Radien vergrößert, damit das Karussell insgesamt breiter und weitläufiger wirkt
+    let radiusX = window.innerWidth * 0.38;
+    let radiusY = window.innerHeight * 0.13;
+
+    // Diagonale Neigung (-20 Grad)
+    const tiltAngle = -20 * (Math.PI / 180);
+
+    const savedAngle = sessionStorage.getItem('carouselAngle');
+    let currentAngle = savedAngle !== null ? parseFloat(savedAngle) : 0;
+    let targetAngle = currentAngle;
+    let isSnapping = false;
+
+    // --- BESCHREIBUNGEN DER UNTERSEITEN (BLINDTEXTE) ---
+    const descriptions = {
+      "buchrücken": "Berechne die genaue Stärke deines Buchrückens basierend auf Papiergrammatur und Seitenzahl.",
+      "feedbackrunden": "Strukturiere und plane Feedbackrunden für deine Designentwürfe.",
+      "fliesen-scan": "Digitalisiere und analysiere Fliesen-Muster in deiner Umgebung.",
+      "ausschießer": "Berechne das optimale Ausschieß-Schema für deinen Druckbogen.",
+      "anleitungen zum buchbinden": "Detaillierte Schritt-für-Schritt-Anleitungen für verschiedene Buchbinde-Techniken.",
+      "skizze zu logo": "Lade Skizzen hoch und verarbeite sie zu ersten Vektorelementen.",
+      "mindmap": "Visualisiere deine Gedanken und verknüpfe Konzepte in einem dynamischen Diagramm.",
+      "druckereien vergleich": "Vergleiche Preise, Lieferzeiten und Angebote verschiedener Druckdienstleister.",
+      "ideensammler": "Hier werden spontane Einfälle, Wörter und Farbcodes strukturiert in einem Mindmap-Raster gesammelt.",
+      "workload-planer": "Visualisiere die Aufteilung deiner persönlichen Arbeitsschritte nach Prozentanteilen als minimalistischen Stack.",
+      "projekt-planer": "Erstelle Zeitpläne und Meilensteine für deine gestalterischen Projekte.",
+      "colab drucker": "Anleitungen zur Druckerinstallation auf dem Mac und Links zu den Treibern für die Colab-Drucker.",
+      "font testsheet": "Generiere Testbögen für verschiedene Schriftarten, um Kontraste und Lesbarkeit zu prüfen.",
+      "präsi timer": "Ein Timer für Präsentationen, der dir hilft, deine Vortragszeit einzuhalten.",
+      "farb-combos": "Erkunde und teste harmonische Farbkombinationen für deine Entwürfe.",
+      "farbkontraste": "Berechne den Kontrastwert (WCAG) zwischen Vorder- und Hintergrundfarben.",
+      "eigenes tool hinzufügen": "Erweitere das Karussell um deine eigenen Lesezeichen und Web-Tools (In Kürze verfügbar)."
+    };
+
+    function updateDescription(block) {
+      const descContainer = document.getElementById('block-description');
+
+      // Blende Beschreibung aus, wenn sich das Karussell zu schnell dreht
+      if (Math.abs(velocity) > 0.002) {
+        descContainer.classList.remove('visible');
+        return;
+      }
+
+      if (!block) return;
+
+      const blockText = block.textContent.replace(/\s+/g, ' ').trim().toLowerCase();
+      const descText = descriptions[blockText] || "";
+
+      if (descContainer.textContent !== descText) {
+        descContainer.classList.remove('visible');
+
+        // Warte auf Fade-out vor dem Anzeigen des neuen Texts
+        setTimeout(() => {
+          if (Math.abs(velocity) <= 0.002) {
+            descContainer.textContent = descText;
+            if (descText !== "") {
+              descContainer.classList.add('visible');
+            }
+          }
+        }, 300);
+      } else if (descText !== "" && !descContainer.classList.contains('visible')) {
+        descContainer.classList.add('visible');
+      }
+    }
+
+    function updateRing(checkHighlight = false) {
+      let frontBlock = null;
+      let maxZ = -1;
+
+      // Berechne den Versatz, damit die vorderste Karte (bei Math.PI/2) exakt mittig bei X=0 liegt
+      const offsetX = -radiusY * Math.sin(tiltAngle);
+
+      blocks.forEach((block, index) => {
+        const baseAngle = (index / totalBlocks) * Math.PI * 2;
+        const angle = baseAngle + currentAngle;
+
+        const originalX = Math.cos(angle) * radiusX;
+        const originalY = Math.sin(angle) * radiusY;
+
+        const rotatedX = originalX * Math.cos(tiltAngle) - originalY * Math.sin(tiltAngle);
+        const rotatedY = originalX * Math.sin(tiltAngle) + originalY * Math.cos(tiltAngle);
+
+        const depthFactor = (Math.sin(angle) + 1) / 2;
+
+        // Basis-Skalierung leicht angepasst für die neuen CSS-Maße
+        const scale = 0.7 + depthFactor * 0.5;
+        const opacity = 0.4 + depthFactor * 0.6;
+        const zIndex = Math.round(depthFactor * 100);
+
+        // Zentriere die Position durch Abzug des offsetX
+        block.style.transform = `translate(-50%, -50%) translate3d(${rotatedX - offsetX}px, ${rotatedY}px, 0) scale(${scale})`;
+        block.style.zIndex = zIndex;
+        block.style.opacity = opacity;
+
+        // Highlight-Klasse entfernen
+        block.classList.remove('is-front');
+
+        if (zIndex > maxZ) {
+          maxZ = zIndex;
+          frontBlock = block;
+        }
+      });
+
+      // Nur highlighten, wenn wir (fast) eingerastet sind
+      if (checkHighlight && frontBlock) {
+        frontBlock.classList.add('is-front');
+
+        // Die vorderste Karte minimal zusätzlich skalieren (z.B. um den Faktor 1.1)
+        const currentTransform = frontBlock.style.transform;
+        const enhancedScale = currentTransform.replace(/scale\((.+)\)/, (match, p1) => `scale(${parseFloat(p1) * 1.1})`);
+        frontBlock.style.transform = enhancedScale;
+
+        // Beschreibung aktualisieren
+        updateDescription(frontBlock);
+      }
+    }
+
+    let velocity = 0;
+    let isDragging = false;
+    const baseSpeed = 0.001; // konstante langsame Drehgeschwindigkeit
+    let autoRotationDirection = 1; // 1 = vorwärts (rechts), -1 = rückwärts (links)
+
+    function animate() {
+      if (isDragging) {
+        // Während des Touchens übernimmt touchmove das Bewegen und Zeichnen.
+        // Die Physik/Auto-Rotation pausiert, um nicht gegen den Finger zu arbeiten.
+      } else if (isSnapping) {
+        const diff = targetAngle - currentAngle;
+        if (Math.abs(diff) > 0.001) {
+          currentAngle += diff * 0.1; // Ease-Faktor fürs Einrasten
+          updateRing(false);
+        } else {
+          currentAngle = targetAngle;
+          updateRing(true);
+          isSnapping = false;
+        }
+      } else {
+        // Auto-Rotation + Abklingen der Scroll-Geschwindigkeit
+        if (Math.abs(velocity) > 0.0001) {
+          currentAngle += velocity;
+          if (velocity !== 0) {
+            autoRotationDirection = Math.sign(velocity);
+          }
+          velocity *= 0.96; // Reibungskoeffizient für sanftes Ausgleiten
+          updateRing(true);
+        } else {
+          velocity = 0;
+          currentAngle += autoRotationDirection * baseSpeed;
+          updateRing(true);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // --- UNENDLICHES MAUSRAD-SCROLLEN ---
+    window.addEventListener('wheel', (e) => {
+      // Verhindert das Vor-/Zurückblättern im Browser bei horizontalem Scrollen
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+      }
+      isSnapping = false; // Tastatur-Einrasten abbrechen
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      velocity += delta * 0.00015;
+    }, { passive: false });
+
+    // --- TOUCH-GESTE ---
+    let touchStartValY = 0;
+    let touchStartValX = 0;
+    window.addEventListener('touchstart', (e) => {
+      isSnapping = false; // Tastatur-Einrasten abbrechen
+      isDragging = true;
+      velocity = 0; // Stoppe Ausgleiten beim Anfassen
+      touchStartValY = e.touches[0].clientY;
+      touchStartValX = e.touches[0].clientX;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      const touchEndValY = e.touches[0].clientY;
+      const touchEndValX = e.touches[0].clientX;
+      const diffY = touchStartValY - touchEndValY;
+      const diffX = touchStartValX - touchEndValX;
+
+      const diff = Math.abs(diffX) > Math.abs(diffY) ? diffX : diffY;
+
+      // Verhindert das Wischen zur Browser-Navigation bei überwiegend horizontaler Bewegung
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        e.preventDefault();
+      }
+
+      currentAngle += diff * 0.004;
+      velocity = diff * 0.004; // Geschwindigkeit basierend auf Wischstrecke
+
+      touchStartValY = touchEndValY;
+      touchStartValX = touchEndValX;
+      updateRing(true);
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('touchcancel', () => {
+      isDragging = false;
+    });
+
+    // --- TASTATUR-STEUERUNG ---
+    window.addEventListener('keydown', (e) => {
+      const angleStep = (Math.PI * 2) / totalBlocks;
+
+      if (e.key === 'ArrowLeft') {
+        velocity = 0;
+        isSnapping = true;
+        autoRotationDirection = -1;
+        const n = Math.round((Math.PI / 2 - currentAngle) / angleStep);
+        targetAngle = (Math.PI / 2) - (n * angleStep) - angleStep;
+      } else if (e.key === 'ArrowRight') {
+        velocity = 0;
+        isSnapping = true;
+        autoRotationDirection = 1;
+        const n = Math.round((Math.PI / 2 - currentAngle) / angleStep);
+        targetAngle = (Math.PI / 2) - (n * angleStep) + angleStep;
+      } else if (e.key === 'Enter') {
+        let selectedBlock = null;
+        let maxZ = -1;
+
+        blocks.forEach(block => {
+          const z = parseInt(block.style.zIndex) || 0;
+          if (z > maxZ) {
+            maxZ = z;
+            selectedBlock = block;
+          }
+        });
+
+        if (selectedBlock && selectedBlock.href) {
+          sessionStorage.setItem('carouselAngle', currentAngle);
+          window.location.href = selectedBlock.href;
+        }
+      }
+    });
+
+    // Custom click handler using pointer events to prevent browser click suppression on moving elements
+    blocks.forEach(block => {
+      let startX = 0;
+      let startY = 0;
+      let startTime = 0;
+
+      block.addEventListener('pointerdown', (e) => {
+        // Only left click or touch
+        if (e.button !== undefined && e.button !== 0) return;
+        startX = e.clientX;
+        startY = e.clientY;
+        startTime = Date.now();
+      });
+
+      block.addEventListener('pointerup', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        const diffX = e.clientX - startX;
+        const diffY = e.clientY - startY;
+        const dist = Math.sqrt(diffX * diffX + diffY * diffY);
+        const duration = Date.now() - startTime;
+
+        // If mouse/finger barely moved and it was a quick tap/click
+        if (dist < 8 && duration < 300) {
+          e.preventDefault();
+          if (block.href) {
+            sessionStorage.setItem('carouselAngle', currentAngle);
+            window.location.href = block.href;
+          }
+        }
+      });
+
+      // Prevent default native click which might be suppressed by browser
+      block.addEventListener('click', (e) => {
+        e.preventDefault();
+      });
+    });
+
+    // Dynamische Anpassung bei Fenster-Resizing
+    window.addEventListener('resize', () => {
+      radiusX = window.innerWidth * 0.38;
+      radiusY = window.innerHeight * 0.13;
+      updateRing();
+    });
+
+    // Initialisierung und Start der Animationsschleife
+    updateRing(true);
+    animate();
+  </script>

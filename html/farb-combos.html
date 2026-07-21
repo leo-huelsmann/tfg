@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RGB Farb-Combos</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Custom style for 3-Column Color Palette */
+    .combos-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .column {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 120px 40px 60px 40px;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      position: relative;
+    }
+
+    #col-base {
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    #col-a {
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .color-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .color-label {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+    }
+
+    .color-val-hex {
+      font-size: clamp(24px, 2.2vw, 44px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .color-val-rgb {
+      font-size: 13px;
+      opacity: 0.85;
+      letter-spacing: 0.02em;
+    }
+
+    /* Presets Section */
+    .presets-container {
+      margin-bottom: auto;
+      margin-top: 30px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .presets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 45vh;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    /* Scrollbar */
+    .presets-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .presets-list::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .presets-list::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    .preset-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.15s, border-color 0.15s;
+      font-family: 'GT-America-Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: inherit;
+    }
+
+    .preset-item:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .preset-item.active {
+      border-color: currentColor;
+      background-color: rgba(255, 255, 255, 0.4);
+      font-weight: bold;
+    }
+
+    .preset-preview {
+      display: flex;
+      width: 48px;
+      height: 16px;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .preset-preview-color {
+      flex: 1;
+      height: 100%;
+    }
+
+    /* Layout responsive adjustment */
+    @media (max-width: 768px) {
+      .combos-container {
+        flex-direction: column;
+      }
+      .column {
+        height: 33.33vh;
+        padding: 30px 20px 20px 20px;
+      }
+      #col-base {
+        padding-top: 100px; /* offset for header */
+        height: calc(33.33vh + 70px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header" style="z-index: 1000; pointer-events: none;">
+    <div class="header-titles" style="pointer-events: auto;">
+      <a href="index.html" class="header-back-link">
+        <h1 id="header-main-title">← tools für gestalter:innen</h1>
+      </a>
+      <h1 id="header-subtitle" style="margin-top: 4px;">RGB Farb-Combos</h1>
+    </div>
+  </div>
+
+  <div class="combos-container">
+    <!-- SPALTE 1: BASISFARBE -->
+    <div class="column" id="col-base">
+      <div class="presets-container">
+        <div id="presets-toggle" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; opacity: 0.75; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none;">
+          <span>Presets</span>
+          <span id="presets-toggle-icon">[+]</span>
+        </div>
+        <div class="presets-list" id="presets-list" style="display: none;">
+          <!-- Dynamically filled -->
+        </div>
+
+        <div class="custom-picker-row" style="display: flex; gap: 12px; align-items: center; margin-top: 24px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; font-weight: bold;">EIGENE FARBE:</div>
+          <div style="position: relative; display: inline-block;">
+            <input type="color" id="custom-picker" value="#0B2545" style="opacity: 0; position: absolute; left: 0; top: 0; width: 32px; height: 32px; cursor: pointer; z-index: 2;" />
+            <div id="picker-visual" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid currentColor; cursor: pointer; background-color: #0b2545; z-index: 1;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-details" id="details-base">
+        <div class="color-label">Basisfarbe</div>
+        <div class="color-val-hex" id="hex-base">#000000</div>
+        <div class="color-val-rgb" id="rgb-base">RGB 0, 0, 0</div>
+      </div>
+    </div>
+
+    <!-- SPALTE 2: KOMBINATION A -->
+    <div class="column" id="col-a">
+      <div></div> <!-- Spacer -->
+      <div class="color-details" id="details-a">
+        <div class="color-label">Kombination A</div>
+        <div class="color-val-hex" id="hex-a">#000000</div>
+        <div class="color-val-rgb" id="rgb-a">RGB 0, 0, 0</div>
+      </div>
+    </div>
+
+    <!-- SPALTE 3: KOMBINATION B -->
+    <div class="column" id="col-b">
+      <div></div> <!-- Spacer -->
+      <div class="color-details" id="details-b">
+        <div class="color-label">Kombination B</div>
+        <div class="color-val-hex" id="hex-b">#000000</div>
+        <div class="color-val-rgb" id="rgb-b">RGB 0, 0, 0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-hints" style="z-index: 1000; pointer-events: none; left: 40px; transform: none;">
+    <div class="key-hint" id="hint-esc">esc</div>
+  </div>
+
+  <script>
+    // Curated color trios
+    const presets = [
+      { name: "Classic Navy", base: "#0B2545", a: "#EEF4F8", b: "#F15A5A" },
+      { name: "Sage & Terracotta", base: "#87A987", a: "#FDFBF7", b: "#D77A61" },
+      { name: "Plum & Mustard", base: "#4A2E35", a: "#E5D9F2", b: "#E6C229" },
+      { name: "Deep Teal & Peach", base: "#004B49", a: "#D1EDE2", b: "#FFB5A7" },
+      { name: "Charcoal & Amber", base: "#2B2D42", a: "#FFB703", b: "#EDF2F4" },
+      { name: "Dusty Clay & Red", base: "#B5838D", a: "#6D597A", b: "#E56B6F" },
+      { name: "Forest & Gold", base: "#2D4A22", a: "#E0A96D", b: "#FCE1E4" },
+      { name: "Steel & Sienna", base: "#3D5A80", a: "#E0F2F1", b: "#EE6C4D" }
+    ];
+
+    const presetsList = document.getElementById('presets-list');
+    const customPicker = document.getElementById('custom-picker');
+    const pickerVisual = document.getElementById('picker-visual');
+
+    const colBase = document.getElementById('col-base');
+    const colA = document.getElementById('col-a');
+    const colb = document.getElementById('col-b'); // Note: ID in HTML is col-b (lowercase)
+
+    const hexBase = document.getElementById('hex-base');
+    const rgbBase = document.getElementById('rgb-base');
+
+    const hexA = document.getElementById('hex-a');
+    const rgbA = document.getElementById('rgb-a');
+
+    const hexB = document.getElementById('hex-b');
+    const rgbB = document.getElementById('rgb-b');
+
+    const mainTitle = document.getElementById('header-main-title');
+    const subTitle = document.getElementById('header-subtitle');
+    const hintEsc = document.getElementById('hint-esc');
+
+    // HEX to RGB formatting helper
+    function hexToRgb(hex) {
+      let r = parseInt(hex.slice(1, 3), 16);
+      let g = parseInt(hex.slice(3, 5), 16);
+      let b = parseInt(hex.slice(5, 7), 16);
+      return `RGB ${r}, ${g}, ${b}`;
+    }
+
+    // WCAG contrast color calculation (YIQ)
+    function getContrastColor(hex) {
+      let r = parseInt(hex.slice(1, 3), 16);
+      let g = parseInt(hex.slice(3, 5), 16);
+      let b = parseInt(hex.slice(5, 7), 16);
+      let yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+      return (yiq >= 128) ? '#000000' : '#ffffff';
+    }
+
+    // HEX to HSL converter
+    function hexToHsl(hex) {
+      let r = parseInt(hex.slice(1, 3), 16) / 255;
+      let g = parseInt(hex.slice(3, 5), 16) / 255;
+      let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return { h: h * 360, s: s * 100, l: l * 100 };
+    }
+
+    // HSL to HEX converter
+    function hslToHex(h, s, l) {
+      s /= 100;
+      l /= 100;
+      let c = (1 - Math.abs(2 * l - 1)) * s;
+      let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      let m = l - c / 2;
+      let r = 0, g = 0, b = 0;
+
+      if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+      else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+      else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+      else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+      else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+      else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+
+      let rHex = Math.round((r + m) * 255).toString(16).padStart(2, '0');
+      let gHex = Math.round((g + m) * 255).toString(16).padStart(2, '0');
+      let bHex = Math.round((b + m) * 255).toString(16).padStart(2, '0');
+
+      return `#${rHex}${gHex}${bHex}`;
+    }
+
+    // Procedural color generation
+    function getHarmoniousColors(hex) {
+      const hsl = hexToHsl(hex);
+      
+      // Color A: Analogous (hue shifted, lightened/darkened slightly)
+      let hA = (hsl.h + 30) % 360;
+      let sA = Math.max(15, Math.min(85, hsl.s * 0.9));
+      let lA = Math.max(20, Math.min(80, hsl.l > 50 ? hsl.l - 15 : hsl.l + 15));
+      const colorA = hslToHex(hA, sA, lA);
+      
+      // Color B: Split Complementary (hue shifted by 150deg)
+      let hB = (hsl.h + 150) % 360;
+      let sB = Math.max(20, Math.min(90, hsl.s * 1.1));
+      let lB = Math.max(15, Math.min(85, hsl.l > 50 ? hsl.l - 25 : hsl.l + 25));
+      const colorB = hslToHex(hB, sB, lB);
+      
+      return { colorA, colorB };
+    }
+
+    // Apply color palette to elements
+    function applyPalette(base, a, b) {
+      // Set background colors
+      colBase.style.backgroundColor = base;
+      colA.style.backgroundColor = a;
+      colb.style.backgroundColor = b;
+
+      // Calculate contrast colors
+      const textBase = getContrastColor(base);
+      const textA = getContrastColor(a);
+      const textB = getContrastColor(b);
+
+      // Set text colors
+      colBase.style.color = textBase;
+      colA.style.color = textA;
+      colb.style.color = textB;
+
+      // Set header text & hints contrast
+      mainTitle.style.color = textBase;
+      subTitle.style.color = textBase;
+      hintEsc.style.color = textBase;
+      hintEsc.style.borderColor = textBase;
+
+      // Update color texts
+      hexBase.textContent = base.toUpperCase();
+      rgbBase.textContent = hexToRgb(base);
+
+      hexA.textContent = a.toUpperCase();
+      rgbA.textContent = hexToRgb(a);
+
+      hexB.textContent = b.toUpperCase();
+      rgbB.textContent = hexToRgb(b);
+    }
+
+    // Initialize preset list DOM
+    function initPresets() {
+      presetsList.innerHTML = '';
+      presets.forEach((preset, index) => {
+        const item = document.createElement('div');
+        item.className = 'preset-item';
+        if (index === 0) item.className += ' active';
+        item.dataset.index = index;
+
+        // Label
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = preset.name;
+        item.appendChild(nameSpan);
+
+        // Preview bar
+        const preview = document.createElement('div');
+        preview.className = 'preset-preview';
+        
+        const c1 = document.createElement('div');
+        c1.className = 'preset-preview-color';
+        c1.style.backgroundColor = preset.base;
+        preview.appendChild(c1);
+
+        const c2 = document.createElement('div');
+        c2.className = 'preset-preview-color';
+        c2.style.backgroundColor = preset.a;
+        preview.appendChild(c2);
+
+        const c3 = document.createElement('div');
+        c3.className = 'preset-preview-color';
+        c3.style.backgroundColor = preset.b;
+        preview.appendChild(c3);
+
+        item.appendChild(preview);
+
+        // Click handler
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          
+          customPicker.value = preset.base;
+          pickerVisual.style.backgroundColor = preset.base;
+          
+          applyPalette(preset.base, preset.a, preset.b);
+        });
+
+        presetsList.appendChild(item);
+      });
+    }
+
+    // Load custom chosen color
+    function loadCustomColor(hex) {
+      // Remove active states from preset list
+      document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active'));
+
+      // Calculate harmonious matching colors
+      const match = getHarmoniousColors(hex);
+      applyPalette(hex, match.colorA, match.colorB);
+    }
+
+    // Input color picker listener
+    customPicker.addEventListener('input', (e) => {
+      const hex = e.target.value;
+      pickerVisual.style.backgroundColor = hex;
+      loadCustomColor(hex);
+    });
+
+    // Keyboard support: Escape returns to main page
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Toggle presets list collapsible
+    const presetsToggle = document.getElementById('presets-toggle');
+    const presetsToggleIcon = document.getElementById('presets-toggle-icon');
+
+    presetsToggle.addEventListener('click', () => {
+      const isHidden = presetsList.style.display === 'none';
+      presetsList.style.display = isHidden ? 'flex' : 'none';
+      presetsToggleIcon.textContent = isHidden ? '[-]' : '[+]';
+    });
+
+    // Initial load
+    initPresets();
+    applyPalette(presets[0].base, presets[0].a, presets[0].b);
+  </script>
+</body>
+</html>

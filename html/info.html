@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Info - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .info-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 4vw;
+      padding-bottom: 100px;
+    }
+
+    .image-grid {
+      display: flex;
+      gap: 2vw;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 4vh;
+    }
+
+    .image-grid img {
+      /* Skaliert zwischen 280px und 600px, idealerweise 30% der Viewport-Breite */
+      width: clamp(280px, 30vw, 600px);
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Info</h1>
+    </div>
+  </div>
+
+  <div class="info-container">
+    <div class="image-grid">
+      <img src="../assets/img/tools_fragebogen_1.png" alt="Tools Fragebogen">
+      <img src="../assets/img/IMG_5356.jpeg" alt="Poster Wand">
+    </div>
+    <a href="https://pad.systemli.org/p/Wünsch_dir_ein_Tool" target="_blank" class="info-btn" style="margin-top: 2vh; text-transform: uppercase;">Wünsch dir ein Tool</a>
+    <div style="margin-top: 40px; margin-bottom: 80px; font-size: clamp(10px, 0.65vw, 14px); color: #555; text-transform: uppercase; font-family: 'GT-America-Mono', monospace; text-align: center;">Ein Werkzeugkasten von Leo Hülsmann</div>
+  </div>
+
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+  </div>
+
+  <script>
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+
+</html>

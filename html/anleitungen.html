@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anleitungen - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px); /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px; /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left column menu */
+    .menu-column {
+      width: 320px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 15px;
+      user-select: none;
+    }
+
+    .menu-item {
+      font-family: 'GT-America-Mono';
+      font-size: clamp(13px, 1.0vw, 18px);
+      font-weight: 500;
+      color: #222;
+      background-color: #e2e2e2;
+      padding: 16px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s, transform 0.15s, color 0.2s;
+      border-radius: 2px;
+    }
+
+    .menu-item.active {
+      background-color: #f2ff00;
+      color: #000;
+      font-weight: bold;
+      transform: translateX(6px);
+      box-shadow: -4px 0 0 #0052CC;
+    }
+
+    .menu-item:hover:not(.active) {
+      background-color: rgba(242, 255, 0, 0.4);
+      transform: translateX(3px);
+    }
+
+    /* Right column content display */
+    .content-column {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 15px; /* For scrollbar gap */
+    }
+
+    /* Custom Scrollbar for premium look */
+    .content-column::-webkit-scrollbar {
+      width: 6px;
+    }
+    .content-column::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb {
+      background: #0052CC;
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb:hover {
+      background: #ff0059;
+    }
+
+    /* Content styling */
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100%;
+    }
+
+    .guide-title {
+      font-size: clamp(24px, 2.2vw, 42px);
+      font-weight: bold;
+      color: #0052CC;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .guide-subtitle {
+      font-size: clamp(14px, 1.0vw, 18px);
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .guide-details-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .details-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .guide-section-title {
+      font-size: clamp(15px, 1.1vw, 20px);
+      color: #0052CC;
+      font-weight: bold;
+      border-bottom: 1px dashed #0052CC;
+      padding-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .materials-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .materials-list li {
+      background-color: #e2e2e2;
+      color: #333;
+      padding: 6px 12px;
+      font-size: clamp(11px, 0.8vw, 14px);
+      border-radius: 4px;
+      border: 1px solid #d2d2d2;
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .steps-list li {
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 18px;
+      font-size: clamp(13px, 0.95vw, 16px);
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .steps-list li::before {
+      content: counter(step-counter) ".";
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #0052CC;
+      font-weight: bold;
+      font-size: clamp(14px, 1.0vw, 18px);
+    }
+
+    /* Right pane image styling */
+    .details-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+    }
+
+    .image-container {
+      border: 1px solid #0052CC;
+      padding: 16px;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      max-height: 40vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Content Fade-in Animation */
+    .content-animate {
+      animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+        padding-bottom: 100px;
+      }
+      .menu-column {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .menu-item {
+        flex: 1 1 45%;
+        padding: 12px 15px;
+      }
+      .content-column {
+        overflow-y: visible;
+        padding-right: 0;
+      }
+      .guide-details-grid {
+        grid-template-columns: 1fr;
+      }
+      .details-right {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Anleitungen zum Buchbinden</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Links: Navigation -->
+    <div class="menu-column" id="menu-column">
+      <!-- Wird dynamisch befüllt -->
+    </div>
+
+    <!-- Rechts: Anleitungsinhalt -->
+    <div class="content-column">
+      <div id="guide-content" class="guide-content">
+        <!-- Wird dynamisch befüllt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Hints am Fuß -->
+  <div class="key-hints">
+    <div class="key-hint">Esc</div>
+    <div class="key-hint key-arrow">↑</div>
+    <div class="key-hint key-arrow">↓</div>
+    <div class="key-hint">1-4</div>
+  </div>
+
+  <script>
+    const guides = [
+      {
+        title: "Fadenheftung",
+        subtitle: "Die klassischste und haltbarste Bindung",
+        materials: ["Papierbögen (gefalzt)", "Buchbinderzwirn", "Heftnadel", "Ahle (Vorstechen)", "Falzbein"],
+        steps: [
+          "Falze mehrere Papierbögen mittig zu Lagen (üblich sind 4-8 Blätter pro Lage).",
+          "Markiere auf dem Falz die Heftlöcher (z. B. 4 bis 6 Löcher im Abstand von je 2-3 cm).",
+          "Steche die Löcher vorsichtig von innen nach außen mit der Ahle vor.",
+          "Nähe die Lagen nacheinander zusammen. Fädele den Faden durch das erste Loch und führe ihn im Zickzack durch die weiteren. Kettstiche verbinden neue Lagen mit den darunterliegenden.",
+          "Verknote das Fadenende stramm am Rücken und bestreiche den Rücken leicht mit Leim, um alles zu sichern."
+        ],
+        image: "../assets/img/fadenheftung.png"
+      },
+      {
+        title: "Klebebindung",
+        subtitle: "Eine einfache, moderne Bindung für lose Blätter",
+        materials: ["Einzelblätter", "Buchbinderleim (Kaltleim)", "Leimpinsel", "2 Pressbretter", "Schraubzwingen"],
+        steps: [
+          "Stoße den Papierstapel am Kopf und Rücken absolut bündig auf.",
+          "Spanne den Stapel fest zwischen zwei Pressbretter. Der zu leimende Rücken sollte etwa 5 mm herausragen.",
+          "Raue den Buchrücken mit grobem Sandpapier oder einer feinen Säge auf. Das vergrößert die Klebefläche für den Leim.",
+          "Trage den Kaltleim mit dem Pinsel gleichmäßig und satt auf den aufgerauten Rücken auf.",
+          "Streiche bei Bedarf einen Streifen Gaze (Stoffgewebe) in den feuchten Leim ein. Das stabilisiert den Rücken zusätzlich."
+        ],
+        image: "../assets/img/klebebindung.png"
+      },
+      {
+        title: "Japanische Bindung",
+        subtitle: "Eine dekorative Bindung für lose Blätter",
+        materials: ["Einzelblätter", "Einbanddeckel", "Starker Faden oder Kordel", "Nadel", "Ahle oder Bohrer", "Klammern"],
+        steps: [
+          "Stoße den Block glatt und fixiere ihn mit Klammern (nutze Pappe als Schutz vor Druckstellen).",
+          "Markiere vier oder mehr Löcher im Abstand von 1 bis 1,5 cm parallel zur Rückenkante.",
+          "Bohre oder steche die Löcher komplett durch den gesamten Papierstapel.",
+          "Nähe mit Nadel und Faden durch die Löcher. Wickele den Faden dabei an jeder Stelle um den Buchrücken und die Kanten (Kopf/Fuß).",
+          "Verknote die fadenenden gut und ziehe sie im Inneren des Lochs fest, damit sie unsichtbar bleiben."
+        ],
+        image: "../assets/img/japanische_bindung.png"
+      },
+      {
+        title: "Leporello-Bindung",
+        subtitle: "Ein langes, im Zickzack gefaltetes Papierband",
+        materials: ["Langer Papierstreifen", "Graupappe für Deckel", "Überzugspapier", "Leim oder Klebestift"],
+        steps: [
+          "Teile den Papierstreifen in gleich breite Abschnitte ein.",
+          "Falze den Streifen abwechselnd nach vorne und hinten (Zickzack-Faltung). Benutze ein Falzbein für scharfe Kanten.",
+          "Schneide zwei Deckel aus Graupappe zu. Sie sollten rundherum ca. 2-3 mm größer sein als die gefalteten Seiten.",
+          "Kaschiere (beziehe) die Graupappen mit dem Überzugspapier deiner Wahl.",
+          "Klebe das erste und das letzte Segment des gefalteten Papierstreifens vollflächig als Spiegel auf die Innenseiten der Deckel."
+        ],
+        image: "../assets/img/leporello_bindung.png"
+      }
+    ];
+
+    let activeIndex = 0;
+
+    function renderMenu() {
+      const menuColumn = document.getElementById('menu-column');
+      menuColumn.innerHTML = '';
+      guides.forEach((guide, index) => {
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'menu-item';
+        if (index === activeIndex) item.className += ' active';
+        
+        // Format index as 01, 02, etc.
+        const num = String(index + 1).padStart(2, '0');
+        item.textContent = `${num}. ${guide.title}`;
+        
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectGuide(index);
+        });
+        menuColumn.appendChild(item);
+      });
+    }
+
+    function selectGuide(index) {
+      activeIndex = index;
+      renderMenu();
+
+      const guide = guides[activeIndex];
+      const contentEl = document.getElementById('guide-content');
+
+      // Reset animation
+      contentEl.classList.remove('content-animate');
+      void contentEl.offsetWidth; // Trigger reflow
+
+      const materialsHTML = guide.materials.map(m => `<li>${m}</li>`).join('');
+      const stepsHTML = guide.steps.map(s => `<li>${s}</li>`).join('');
+
+      contentEl.innerHTML = `
+        <h2 class="guide-title">${guide.title}</h2>
+        <div class="guide-subtitle">${guide.subtitle}</div>
+        
+        <div class="guide-details-grid">
+          <div class="details-left">
+            <span class="guide-section-title">Materialien</span>
+            <ul class="materials-list">
+              ${materialsHTML}
+            </ul>
+            
+            <span class="guide-section-title">Anleitung</span>
+            <ol class="steps-list" style="counter-reset: step-counter;">
+              ${stepsHTML}
+            </ol>
+          </div>
+          <div class="details-right">
+            <div class="image-container">
+              <img src="${guide.image}" alt="Illustration ${guide.title}">
+            </div>
+          </div>
+        </div>
+      `;
+
+      contentEl.classList.add('content-animate');
+    }
+
+    // Tastatursteuerung
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        const next = (activeIndex + 1) % guides.length;
+        selectGuide(next);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        const prev = (activeIndex - 1 + guides.length) % guides.length;
+        selectGuide(prev);
+      } else if (e.key >= '1' && e.key <= '4') {
+        const index = parseInt(e.key) - 1;
+        if (index >= 0 && index < guides.length) {
+          selectGuide(index);
+        }
+      }
+    });
+
+    // Escape-Taste bringt zurück zur Hauptseite
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', () => {
+      selectGuide(0);
+    });
+  </script>
+</body>
+
+</html>

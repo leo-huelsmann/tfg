@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Druckereien-Vergleich - toolsforgestalters</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'GT-America-Mono', monospace;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 80px); /* Adjust for header */
+      margin-top: 80px;
+      padding: 20px 40px 80px 40px; /* Offset at bottom for key hints */
+      gap: 40px;
+      overflow: hidden;
+    }
+
+    /* Left column menu */
+    .menu-column {
+      width: 320px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+      user-select: none;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .menu-item {
+      font-family: 'GT-America-Mono';
+      font-size: clamp(13px, 1.0vw, 18px);
+      font-weight: 500;
+      color: #222;
+      background-color: #e2e2e2;
+      padding: 14px 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.2s, transform 0.15s, color 0.2s;
+      border-radius: 2px;
+    }
+
+    .menu-item.active {
+      background-color: #f2ff00;
+      color: #000;
+      font-weight: bold;
+      transform: translateX(6px);
+      box-shadow: -4px 0 0 #0052CC;
+    }
+
+    .menu-item:hover:not(.active) {
+      background-color: rgba(242, 255, 0, 0.4);
+      transform: translateX(3px);
+    }
+
+    /* Right column content display */
+    .content-column {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 15px; /* For scrollbar gap */
+    }
+
+    /* Custom Scrollbar for premium look */
+    .content-column::-webkit-scrollbar,
+    .menu-column::-webkit-scrollbar {
+      width: 6px;
+    }
+    .content-column::-webkit-scrollbar-track,
+    .menu-column::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb,
+    .menu-column::-webkit-scrollbar-thumb {
+      background: #0052CC;
+      border-radius: 10px;
+    }
+    .content-column::-webkit-scrollbar-thumb:hover,
+    .menu-column::-webkit-scrollbar-thumb:hover {
+      background: #ff0059;
+    }
+
+    /* Content styling */
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100%;
+    }
+
+    .guide-title {
+      font-size: clamp(24px, 2.2vw, 42px);
+      font-weight: bold;
+      color: #0052CC;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .guide-subtitle {
+      font-size: clamp(14px, 1.0vw, 18px);
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .guide-section-title {
+      font-size: clamp(15px, 1.1vw, 20px);
+      color: #0052CC;
+      font-weight: bold;
+      border-bottom: 1px dashed #0052CC;
+      padding-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Content Fade-in Animation */
+    .content-animate {
+      animation: fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+        padding-bottom: 100px;
+      }
+      .menu-column {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-y: visible;
+        padding-right: 0;
+      }
+      .menu-item {
+        flex: 1 1 45%;
+        padding: 12px 15px;
+      }
+      .content-column {
+        overflow-y: visible;
+        padding-right: 0;
+      }
+      .details-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-titles">
+      <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
+      <h1>Druckereien-Vergleich</h1>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Links: Navigation -->
+    <div class="menu-column" id="menu-column">
+      <!-- Wird dynamisch befüllt -->
+    </div>
+
+    <!-- Rechts: Inhalt -->
+    <div class="content-column">
+      <div id="guide-content" class="guide-content">
+        <!-- Wird dynamisch befüllt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Hints am Fuß -->
+  <div class="key-hints">
+    <div class="key-hint">esc</div>
+    <div class="key-hint key-arrow">↑</div>
+    <div class="key-hint key-arrow">↓</div>
+    <div class="key-hint">1-9</div>
+  </div>
+
+  <script>
+    const shops = [
+      {
+        category: "Online-Shops",
+        name: "Heenemann-Onlineshop",
+        link: "https://www.heenemann-druck.de/",
+        tech: "Flüssigtoner / HP Indigo",
+        pros: [
+          "Großes Format bis 50 x 70 cm",
+          "Guter Indigo-Druck auf offenem wie gestrichenem Papier",
+          "Günstig im Online-Shop"
+        ],
+        cons: [
+          "Laufrichtung jeweils nur in bestimmten Papiergewichten (schränkt die Auswahl oft ein)",
+          "Vorsicht beim Umschlag: Farbe reibt sich leicht ab (ggf. Cellophanierung/Folienkaschierung bestellen)"
+        ]
+      },
+      {
+        category: "Online-Shops",
+        name: "Online-Druck.biz",
+        link: "https://www.online-druck.biz/shop/buch-buecher/design-buch-natur-din-a4-210y297-mm_514.html",
+        tech: "Trockentoner, ölbasiert",
+        pros: [
+          "Interessante Binde-Varianten (offener Rücken, Fadenfarben etc.)",
+          "Bei Zwischenformaten ist Selbstschneiden möglich"
+        ],
+        cons: [
+          "Leicht glänzender Farbauftrag (unter Umständen auf offenem Papier nicht erwünscht)",
+          "Feste Standardformate"
+        ]
+      },
+      {
+        category: "Online-Shops",
+        name: "Buch.one (Grammlich)",
+        link: "https://buch.one/konfigurator/",
+        tech: "Trockentoner, ölbasiert",
+        pros: [
+          "Extrem detaillierter und vielfältiger Konfigurator (Produktionsvarianten von Leinen-Hardcover über offenen Rücken bis zu beliebigen Bindungen)",
+          "Verarbeiten auch eigene Drucke oder Bögen von anderen Dienstleistern (man kann gedruckte Bögen zur Weiterverarbeitung einsenden)",
+          "Persönlicher Kontakt möglich"
+        ],
+        cons: [
+          "Leicht glänzender Farbauftrag (unter Umständen auf offenem Papier nicht so schön)",
+          "Mindestmenge von 5 Exemplaren"
+        ]
+      },
+      {
+        category: "Online-Shops",
+        name: "Wir machen Druck",
+        link: "https://www.wir-machen-druck.de/produkt-sortiment.html",
+        tech: "Unklar",
+        pros: [
+          "Sehr günstig",
+          "Viele verschiedene Optionen",
+          "Wird an Kunsthochschulen (z. B. Weißensee) häufiger genutzt"
+        ],
+        cons: [
+          "Druckergebnis nicht konstant (belegt freie Kapazitäten bei wechselnden Druckereien, daher Verfahren nicht einheitlich)",
+          "Komplizierter Webshop"
+        ]
+      },
+      {
+        category: "Individualdruck",
+        name: "Thinkprint, Hamburg",
+        link: "",
+        tech: "HP Indigo",
+        pros: [
+          "Vor Ort in Hamburg ansässig (ideal für direkte Absprachen)",
+          "Hochwertiger Digitaldruck mit HP Indigo"
+        ],
+        cons: [
+          "Kein Direktkonfigurator im Web (individueller Kontakt per Mail/Telefon erforderlich)"
+        ]
+      },
+      {
+        category: "Individualdruck",
+        name: "Ausdruck Schaare, Berlin",
+        link: "",
+        tech: "HP Indigo",
+        pros: [
+          "Digitaldruck mit hochwertiger HP Indigo",
+          "Guter Anlaufpunkt für individuelle studentische Projekte"
+        ],
+        cons: [
+          "In Berlin ansässig (für Hamburger Gestalter ggf. Versand nötig)",
+          "Kein Direktkonfigurator im Web"
+        ]
+      },
+      {
+        category: "Individualdruck",
+        name: "Druckwelten, Hamburg-Altona",
+        link: "https://druckwelten.net/",
+        tech: "Digitaldruck & Offsetdruck",
+        pros: [
+          "Vor Ort in Hamburg-Ottensen/Altona ansässig (Bahrenfelder Str. 101a)",
+          "Bieten spezielle Unterstützung und Beratung für studentische Semester- und Abschlussarbeiten",
+          "Kopierservice, Großdrucke und Weiterverarbeitung (Binden etc.) unkompliziert vor Ort möglich"
+        ],
+        cons: [
+          "Individuelle Absprachen erforderlich (kein schneller Standard-Onlinekonfigurator)"
+        ]
+      },
+      {
+        category: "Individualdruck",
+        name: "Reset, Hamburg St. Pauli",
+        link: "https://resetstpauli.de/",
+        tech: "Digitaldruck, Offsetdruck, Siebdruck & Letterpress",
+        pros: [
+          "Sehr breites Spektrum an Druckverfahren (inklusive Siebdruck und Letterpress für feine Effekte)",
+          "Starker Fokus auf Nachhaltigkeit (Ökostrom, mineralölfreie Bio-Farben, klimaneutrale Zertifizierung)",
+          "Ermöglicht Kleinstauflagen (ab 1 Exemplar) bis hin zu Großauflagen"
+        ],
+        cons: [
+          "Kein schneller Standard-Onlinekonfigurator (Anfrage und Konzeption laufen klassisch per Mail/Beratung)"
+        ]
+      },
+      {
+        category: "Papier",
+        name: "SPS Paper",
+        link: "https://www.sps-paper.de/",
+        tech: "Papiershop",
+        pros: [
+          "Schneller Webshop, aber auch individuelle Bestellungen auf Anfrage möglich",
+          "Schöne offene, leicht gebliche Papiere im Angebot",
+          "Kann auf Anfrage das gesamte Sortiment des deutschen Papiermarktes bestellen"
+        ],
+        cons: [
+          "Lieferung/Berechnung meist in Riesen (Einheit von meist 250 oder 500 Bogen)"
+        ]
+      }
+    ];
+
+    let activeIndex = 0;
+
+    function renderMenu() {
+      const menuColumn = document.getElementById('menu-column');
+      menuColumn.innerHTML = '';
+      
+      let currentCategory = "";
+      shops.forEach((shop, index) => {
+        if (shop.category !== currentCategory) {
+          currentCategory = shop.category;
+          const catHeader = document.createElement('div');
+          catHeader.style.fontSize = '11px';
+          catHeader.style.fontWeight = 'bold';
+          catHeader.style.color = '#0052CC';
+          catHeader.style.marginTop = index === 0 ? '0px' : '22px';
+          catHeader.style.marginBottom = '8px';
+          catHeader.style.textTransform = 'uppercase';
+          catHeader.style.letterSpacing = '0.08em';
+          catHeader.textContent = currentCategory;
+          menuColumn.appendChild(catHeader);
+        }
+        
+        const item = document.createElement('a');
+        item.href = '#';
+        item.className = 'menu-item';
+        if (index === activeIndex) item.className += ' active';
+        
+        const num = String(index + 1).padStart(2, '0');
+        item.textContent = `${num}. ${shop.name}`;
+        
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectShop(index);
+        });
+        menuColumn.appendChild(item);
+      });
+    }
+
+    function selectShop(index) {
+      activeIndex = index;
+      renderMenu();
+
+      const shop = shops[activeIndex];
+      const contentEl = document.getElementById('guide-content');
+
+      // Reset animation
+      contentEl.classList.remove('content-animate');
+      void contentEl.offsetWidth; // Trigger reflow
+
+      const linkHTML = shop.link 
+        ? `<div style="margin-top: 10px; margin-bottom: 10px;">
+             <a href="${shop.link}" target="_blank" class="info-btn" style="pointer-events: auto; text-decoration: none;">Webseite öffnen ↗</a>
+           </div>`
+        : '';
+
+      const techHTML = shop.tech 
+        ? `<div>
+             <span class="guide-section-title">Technologie</span>
+             <p style="font-size: clamp(13px, 0.95vw, 16px); line-height: 1.6; color: #333; margin: 5px 0 0 0;">${shop.tech}</p>
+           </div>`
+        : '';
+
+      const prosHTML = shop.pros && shop.pros.length > 0
+        ? `<div>
+             <span class="guide-section-title" style="color: #0052CC; border-bottom-color: #0052CC;">Vorteile (Pros)</span>
+             <ul class="steps-list" style="margin-top: 10px;">
+               ${shop.pros.map(pro => `<li style="position: relative; padding-left: 25px; margin-bottom: 12px; font-size: clamp(13px, 0.95vw, 16px); line-height: 1.5; color: #333;"><span style="position: absolute; left: 0; top: 0; color: #0052CC; font-weight: bold;">+</span>${pro}</li>`).join('')}
+             </ul>
+           </div>`
+        : '';
+
+      const consHTML = shop.cons && shop.cons.length > 0
+        ? `<div>
+             <span class="guide-section-title" style="color: #ff0059; border-bottom-color: #ff0059;">Nachteile (Cons)</span>
+             <ul class="steps-list" style="margin-top: 10px;">
+               ${shop.cons.map(con => `<li style="position: relative; padding-left: 25px; margin-bottom: 12px; font-size: clamp(13px, 0.95vw, 16px); line-height: 1.5; color: #333;"><span style="position: absolute; left: 0; top: 0; color: #ff0059; font-weight: bold;">–</span>${con}</li>`).join('')}
+             </ul>
+           </div>`
+        : '';
+
+      contentEl.innerHTML = `
+        <h2 class="guide-title">${shop.name}</h2>
+        <div class="guide-subtitle">${shop.category}</div>
+        
+        ${linkHTML}
+        
+        <div class="details-grid">
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            ${techHTML}
+            ${prosHTML}
+          </div>
+          <div>
+            ${consHTML}
+          </div>
+        </div>
+      `;
+
+      contentEl.classList.add('content-animate');
+    }
+
+    // Tastatursteuerung
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        const next = (activeIndex + 1) % shops.length;
+        selectShop(next);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        const prev = (activeIndex - 1 + shops.length) % shops.length;
+        selectShop(prev);
+      } else if (e.key >= '1' && e.key <= '9') {
+        const index = parseInt(e.key) - 1;
+        if (index >= 0 && index < shops.length) {
+          selectShop(index);
+        }
+      }
+    });
+
+    // Escape-Taste bringt zurück zur Hauptseite
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', () => {
+      selectShop(0);
+    });
+  </script>
+</body>
+
+</html>
