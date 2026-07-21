@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ausschießen - toolsforgestalters</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <title>Anleitungen - toolsforgestalters</title>
+  <link rel="stylesheet" href="css/style.css">
   <style>
     body {
       display: flex;
@@ -266,7 +266,7 @@
   <div class="header">
     <div class="header-titles">
       <a href="index.html" class="header-back-link"><h1>← tools für gestalter:innen</h1></a>
-      <h1>Ausschießen & Druckvorbereitung</h1>
+      <h1>Anleitungen zum Buchbinden</h1>
     </div>
   </div>
 
@@ -295,56 +295,56 @@
   <script>
     const guides = [
       {
-        title: "Grundlagen",
-        subtitle: "Was ist Ausschießen und wozu dient es?",
-        materials: ["Einzelblatt-PDF (fortlaufend)", "Druckbogen-Format", "Falzschema", "Rasterlineal"],
-        steps: [
-          "Erzeuge ein PDF, in dem alle Seiten einzeln und fortlaufend (1, 2, 3...) vorliegen. Exportiere niemals Doppelseiten!",
-          "Bestimme das Endformat deines Buchs (z. B. A5) und das Druckbogenformat deiner Druckerei (z. B. A3 oder SRA3).",
-          "Berechne, wie viele Seiten auf einen Bogen passen (z. B. A5 auf A3 = 4 Seiten pro Bogenseite, 8 Seiten Vorder-/Rückseite).",
-          "Berücksichtige das Falzschema: Beim Falzen drehen sich Seiten um 90 oder 180 Grad. Im Ausschieß-Layout müssen diese entsprechend rotiert werden.",
-          "Achte auf absolute Passgenauigkeit (Deckungsgleichheit) von Vorderseite (Schöndruck) und Rückseite (Widerdruck)."
-        ],
-        image: "../assets/img/ausschiesser_grundlagen.png"
-      },
-      {
         title: "Fadenheftung",
-        subtitle: "Lagen-Ausschießen für geheftete Broschüren",
-        materials: ["Heftlagen-Plan", "Lagengröße (meist 4er-Schritte)", "Ausschieß-Software oder InDesign-Booklet"],
+        subtitle: "Die klassischste und haltbarste Bindung",
+        materials: ["Papierbögen (gefalzt)", "Buchbinderzwirn", "Heftnadel", "Ahle (Vorstechen)", "Falzbein"],
         steps: [
-          "Teile die Gesamtseitenzahl deines Buches durch die gewünschte Lagengröße (z. B. 16 Seiten pro Lage).",
-          "Wichtig: Die Gesamtseitenzahl des Buches muss immer durch 4 teilbar sein, um leere Seiten am Ende zu vermeiden.",
-          "Für jede Lage gilt: Die erste und die letzte Seite liegen auf demselben Bogen (z. B. bei einer 8-seitigen Lage liegen 8 & 1 außen, 2 & 7 innen).",
-          "Berechne den Bundzuwachs (Verdrängung): Da innere Bögen durch die Papierdicke nach außen wandern, müssen die inneren Seiten minimal nach innen verschoben werden (ca. 0,1-0,3 mm pro Bogen).",
-          "Exportiere jede Lage als eigenständiges, ausgeschossenes Heft-Dokument für den Druck."
+          "Falze mehrere Papierbögen mittig zu Lagen (üblich sind 4-8 Blätter pro Lage).",
+          "Markiere auf dem Falz die Heftlöcher (z. B. 4 bis 6 Löcher im Abstand von je 2-3 cm).",
+          "Steche die Löcher vorsichtig von innen nach außen mit der Ahle vor.",
+          "Nähe die Lagen nacheinander zusammen. Fädele den Faden durch das erste Loch und führe ihn im Zickzack durch die weiteren. Kettstiche verbinden neue Lagen mit den darunterliegenden.",
+          "Verknote das Fadenende stramm am Rücken und bestreiche den Rücken leicht mit Leim, um alles zu sichern."
         ],
-        image: "../assets/img/ausschiesser_fadenheftung.png"
+        image: "assets/img/fadenheftung.png"
       },
       {
         title: "Klebebindung",
-        subtitle: "Einzelblatt-Ausschießen für klebegebundene Bücher",
-        materials: ["Einzelblatt-Block", "Fräsrand-Zugabe (2-3 mm)", "Leimspur-Freihaltung", "Breiter Innensteg"],
+        subtitle: "Eine einfache, moderne Bindung für lose Blätter",
+        materials: ["Einzelblätter", "Buchbinderleim (Kaltleim)", "Leimpinsel", "2 Pressbretter", "Schraubzwingen"],
         steps: [
-          "Beachte den Fräsanschnitt am Rückenbund (meist 2 bis 3 mm). Dieser Bereich wird vor dem Leimen abgefräst/aufgeraut.",
-          "Die Seitenreihenfolge ist hier linearer: Seite 1 und 2 werden als Vorder- und Rückseite auf dasselbe Blatt gedruckt.",
-          "Nutze Mehrfachnutzen (z. B. 2x Seite 1 & 2 nebeneinander auf einem Bogen), um Papier und Druckgänge optimal auszunutzen.",
-          "Plane einen breiteren Innensteg (Rand) ein, da durch die Klebung und das Aufschlagverhalten Text nahe am Rücken schlechter lesbar ist.",
-          "Exportiere den Umschlag als separates Dokument und berechne die Rückenstärke passend (siehe Buchrücken-Rechner)."
+          "Stoße den Papierstapel am Kopf und Rücken absolut bündig auf.",
+          "Spanne den Stapel fest zwischen zwei Pressbretter. Der zu leimende Rücken sollte etwa 5 mm herausragen.",
+          "Raue den Buchrücken mit grobem Sandpapier oder einer feinen Säge auf. Das vergrößert die Klebefläche für den Leim.",
+          "Trage den Kaltleim mit dem Pinsel gleichmäßig und satt auf den aufgerauten Rücken auf.",
+          "Streiche bei Bedarf einen Streifen Gaze (Stoffgewebe) in den feuchten Leim ein. Das stabilisiert den Rücken zusätzlich."
         ],
-        image: "../assets/img/ausschiesser_klebebindung.png"
+        image: "assets/img/klebebindung.png"
       },
       {
-        title: "Druckvorbereitung",
-        subtitle: "Schnittmarken, Anschnitt & Export-Vorgaben",
-        materials: ["Anschnitt (mind. 3 mm)", "Schnittmarken (3 mm Versatz)", "Passermarken", "PDF/X-4 Exportprofil"],
+        title: "Japanische Bindung",
+        subtitle: "Eine dekorative Bindung für lose Blätter",
+        materials: ["Einzelblätter", "Einbanddeckel", "Starker Faden oder Kordel", "Nadel", "Ahle oder Bohrer", "Klammern"],
         steps: [
-          "Lege in deinem Layout-Programm (z. B. InDesign) einen Anschnitt von mindestens 3 mm an allen Außenkanten an.",
-          "Ziehe alle Bilder und Farbflächen, die bis an den Papierrand gehen sollen, komplett über die Seitenkante hinaus bis an die Anschnittlinie.",
-          "Aktiviere beim PDF-Export die Schnittmarken (Trim Marks). Diese zeigen der Druckerei, wo das Papier geschnitten werden muss.",
-          "Stelle die Schnittmarken auf einen Versatz von mindestens 3 mm ein, damit sie nicht im Anschnittbereich liegen.",
-          "Exportiere im Standard PDF/X-3:2002 oder PDF/X-4, um Farbprofile (z. B. CMYK ECI-ISO Coated) einzubetten."
+          "Stoße den Block glatt und fixiere ihn mit Klammern (nutze Pappe als Schutz vor Druckstellen).",
+          "Markiere vier oder mehr Löcher im Abstand von 1 bis 1,5 cm parallel zur Rückenkante.",
+          "Bohre oder steche die Löcher komplett durch den gesamten Papierstapel.",
+          "Nähe mit Nadel und Faden durch die Löcher. Wickele den Faden dabei an jeder Stelle um den Buchrücken und die Kanten (Kopf/Fuß).",
+          "Verknote die fadenenden gut und ziehe sie im Inneren des Lochs fest, damit sie unsichtbar bleiben."
         ],
-        image: "../assets/img/ausschiesser_vorbereitung.png"
+        image: "assets/img/japanische_bindung.png"
+      },
+      {
+        title: "Leporello-Bindung",
+        subtitle: "Ein langes, im Zickzack gefaltetes Papierband",
+        materials: ["Langer Papierstreifen", "Graupappe für Deckel", "Überzugspapier", "Leim oder Klebestift"],
+        steps: [
+          "Teile den Papierstreifen in gleich breite Abschnitte ein.",
+          "Falze den Streifen abwechselnd nach vorne und hinten (Zickzack-Faltung). Benutze ein Falzbein für scharfe Kanten.",
+          "Schneide zwei Deckel aus Graupappe zu. Sie sollten rundherum ca. 2-3 mm größer sein als die gefalteten Seiten.",
+          "Kaschiere (beziehe) die Graupappen mit dem Überzugspapier deiner Wahl.",
+          "Klebe das erste und das letzte Segment des gefalteten Papierstreifens vollflächig als Spiegel auf die Innenseiten der Deckel."
+        ],
+        image: "assets/img/leporello_bindung.png"
       }
     ];
 
@@ -391,7 +391,7 @@
         
         <div class="guide-details-grid">
           <div class="details-left">
-            <span class="guide-section-title">Anforderungen</span>
+            <span class="guide-section-title">Materialien</span>
             <ul class="materials-list">
               ${materialsHTML}
             </ul>
