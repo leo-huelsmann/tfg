@@ -29,16 +29,12 @@
       overflow: hidden;
     }
 
-    /* Left panel: Disabled Form */
     .controls-panel {
       width: 380px;
       min-width: 320px;
       display: flex;
       flex-direction: column;
       gap: 24px;
-      opacity: 0.55; /* Ghostly disabled state */
-      pointer-events: none; /* Deactivate interaction */
-      user-select: none;
       border-right: 1px solid rgba(0, 0, 0, 0.08);
       padding-right: 15px;
     }
@@ -143,39 +139,32 @@
   </div>
 
   <div class="main-container">
-    <!-- LEFT PANEL: DISABLED PREVIEW FORM -->
+    <!-- LEFT PANEL: FORM -->
     <div class="controls-panel">
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; font-weight: bold; margin-bottom: -10px;">Tool Konfiguration</div>
       
       <div>
         <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; font-weight: bold;">Name des Web-Tools</label>
-        <input type="text" class="input-field" value="" placeholder="z. B. Figma" disabled />
+        <input type="text" id="tool-name-input" class="input-field" value="" placeholder="z. B. Figma" />
       </div>
 
       <div>
         <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #777; font-weight: bold;">Web-Link (URL)</label>
-        <input type="text" class="input-field" value="" placeholder="https://figma.com" disabled />
+        <input type="text" id="tool-url-input" class="input-field" value="" placeholder="https://figma.com" />
       </div>
 
       <div style="margin-top: 10px;">
-        <button type="button" class="info-btn" style="width: 100%; text-transform: uppercase; background-color: #e2e2e2; border-color: #d2d2d2; color: #999; cursor: not-allowed;" disabled>Tool Speichern</button>
+        <button type="button" id="add-tool-btn" class="info-btn" style="width: 100%; text-transform: uppercase; background-color: #000; color: #fff; cursor: pointer; padding: 12px; border: none; font-family: 'GT-America-Mono', monospace; font-size: 13px; font-weight: bold; border-radius: 4px; transition: background-color 0.2s;">Tool Hinzufügen</button>
       </div>
     </div>
 
     <div class="info-panel">
       <div class="info-card">
         <p>
-          Dieses Feature ermöglicht es dir bald, beliebige externe Web-Tools oder Lesezeichen direkt als neue Kacheln in das rotierende Hauptkarussell einzubetten. So kannst du dir deine ganz persönliche Werkzeugkiste zusammenstellen.
+          Hier kannst du temporär beliebige externe Web-Tools oder Lesezeichen als neue Kacheln in das rotierende Hauptkarussell einbetten. 
+          <br><br>
+          <i>Hinweis: Deine hinzugefügten Tools werden nur für die aktuelle Browser-Session gespeichert.</i>
         </p>
-        
-        <!-- COMING SOON BADGE (Yellow spiky circle on the bottom-left corner) -->
-        <div class="coming-soon-badge-container">
-          <svg class="coming-soon-badge" xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 160 160">
-            <path id="spiky-path" fill="#F2FF00" stroke="none" />
-            <text x="80" y="75" font-family="'GT-America-Mono', monospace" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="0.04em">COMING</text>
-            <text x="80" y="90" font-family="'GT-America-Mono', monospace" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="0.04em">SOON</text>
-          </svg>
-        </div>
       </div>
     </div>
   </div>
@@ -213,9 +202,45 @@
       }
     });
 
-    // Initialize spiky path on load
+    // Initialize spiky path on load (if badge is present)
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('spiky-path').setAttribute('d', generateSpikyPath(24, 76, 62));
+      const spikyPath = document.getElementById('spiky-path');
+      if (spikyPath) {
+        spikyPath.setAttribute('d', generateSpikyPath(24, 76, 62));
+      }
+    });
+
+    // Add Tool Logic
+    document.getElementById('add-tool-btn').addEventListener('click', () => {
+      const nameInput = document.getElementById('tool-name-input').value.trim();
+      let urlInput = document.getElementById('tool-url-input').value.trim();
+
+      if (!nameInput || !urlInput) {
+        alert("Bitte gib einen Namen und eine URL ein.");
+        return;
+      }
+
+      if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+        urlInput = 'https://' + urlInput;
+      }
+
+      const newTool = { name: nameInput, url: urlInput };
+      
+      let customTools = [];
+      const stored = sessionStorage.getItem('customTools');
+      if (stored) {
+        try {
+          customTools = JSON.parse(stored);
+        } catch (e) {
+          console.error("Error parsing stored tools", e);
+        }
+      }
+
+      customTools.push(newTool);
+      sessionStorage.setItem('customTools', JSON.stringify(customTools));
+
+      // Redirect back to carousel
+      window.location.href = 'index.html';
     });
   </script>
 </body>

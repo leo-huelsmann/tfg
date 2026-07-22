@@ -137,7 +137,14 @@
     .block-farbkontraste:hover {
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='155' viewBox='0 0 140 155'><rect width='100%25' height='100%25' fill='%23f5f5f5'/><circle cx='70' cy='85' r='60' fill='none' stroke='url(%23wheel-grad)' stroke-width='16'/><defs><linearGradient id='wheel-grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='red'/><stop offset='33%25' stop-color='yellow'/><stop offset='66%25' stop-color='blue'/><stop offset='100%25' stop-color='red'/></linearGradient></defs><line x1='40' y1='50' x2='100' y2='120' stroke='black' stroke-width='1.5' stroke-dasharray='3,3'/><circle cx='40' cy='50' r='5' fill='blue'/><circle cx='100' cy='120' r='5' fill='yellow'/></svg>");
     }
-    */
+    .block-custom:hover {
+      background-color: #0052CC !important;
+      background-image: none !important;
+    }
+    
+    .block-custom.is-front::before {
+      background-color: #0052CC !important;
+    }
   </style>
 </head>
 
@@ -186,6 +193,25 @@
   <div id="block-description" class="block-description"></div>
 
   <script>
+    const ringContainer = document.getElementById('ring');
+    const customToolsStr = sessionStorage.getItem('customTools');
+    let customTools = [];
+    if (customToolsStr) {
+      try {
+        customTools = JSON.parse(customToolsStr);
+        customTools.forEach(tool => {
+          const a = document.createElement('a');
+          a.href = tool.url;
+          a.className = 'block block-custom';
+          a.target = '_blank'; // Open external tools in new tab
+          a.innerHTML = `<span class="block-text">${tool.name}</span>`;
+          ringContainer.appendChild(a);
+        });
+      } catch (e) {
+        console.error("Error parsing custom tools", e);
+      }
+    }
+
     const blocks = document.querySelectorAll('.block');
     const totalBlocks = blocks.length;
 
@@ -221,6 +247,11 @@
       "farbkontraste": "Berechne den Kontrastwert (WCAG) zwischen Vorder- und Hintergrundfarben.",
       "eigenes tool hinzufügen": "Erweitere das Karussell um deine eigenen Lesezeichen und Web-Tools (In Kürze verfügbar)."
     };
+    
+    // Dynamically add descriptions for custom tools
+    customTools.forEach(tool => {
+      descriptions[tool.name.replace(/\s+/g, ' ').trim().toLowerCase()] = "Selbst hinzugefügtes Web-Tool: " + tool.url;
+    });
 
     function updateDescription(block) {
       const descContainer = document.getElementById('block-description');
